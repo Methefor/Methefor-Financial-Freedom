@@ -1,0 +1,66 @@
+{
+  "stocks": {
+    "tech_giants": [
+      "NVDA",
+      "GOOG",
+      "GOOGL",
+      "MSFT",
+      "AMD",
+      "AMZN",
+      "AAPL",
+      "TSLA",
+      "META",
+      "AVGO",
+      "INTC",
+      "ORCL",
+      "ADBE"
+    ],
+    "ai_chips": ["MRVL", "LSCC", "APP", "SUPX"],
+    "emerging_tech": ["PLTR", "SYM", "RKLB", "HWM", "OSCR"],
+    "automotive": ["TSLA", "TSM", "GM", "BYDDY"],
+    "energy_clean": ["BE", "NRG", "ETN"],
+    "fintech": ["MSTR", "HOOD", "SPOT", "RDDT"],
+    "retail": ["WMT", "CVNA"],
+    "commodities": ["SLV", "GC=F"],
+    "turkish_stocks": ["THYAO.IS", "ASELS.IS", "TUPRS.IS", "BIMAS.IS"]
+  },
+  "crypto": ["BTC-USD", "ETH-USD", "SOL-USD", "XRP-USD"],
+  "discovery": {
+    "enabled": true,
+    "categories": ["top_gainers", "top_losers", "most_active", "trending"],
+    "filters": {
+      "min_volume": 1000000,
+      "min_price": 5.0,
+      "max_price": 1000.0,
+      "min_market_cap": 100000000
+    },
+    "sources": [
+      "finviz_screener",
+      "yahoo_trending",
+      "reddit_wallstreetbets",
+      "twitter_trending"
+    ]
+  },
+  "priorities": {
+    "high": ["NVDA", "AMD", "PLTR", "SLV", "BTC-USD", "MSTR"],
+    "medium": ["TSLA", "AAPL", "META", "ETH-USD", "ASELS.IS"],
+    "low": ["WMT", "GM", "BIMAS.IS"]
+  },
+  "alerts": {
+    "price_change_threshold": 5.0,
+    "volume_spike_multiplier": 1.5,
+    "pre_market_threshold": 3.0,
+    "discovery_threshold": 10.0
+  },
+  "auto_discovery": {
+    "enabled": true,
+    "interval_hours": 6,
+    "max_new_symbols": 15,
+    "criteria": {
+      "min_volume_surge": 3.0,
+      "min_price_change": 7.0,
+      "min_news_count": 3,
+      "min_sentiment_score": 0.5
+    }
+  }
+}

@@ -1,0 +1,118 @@
+{
+  "news_sources": {
+    "rss_feeds": {
+      "general": [
+        {
+          "name": "Yahoo Finance",
+          "url": "https://finance.yahoo.com/news/rssindex",
+          "priority": "high",
+          "keywords": ["market", "stock", "commodities", "silver", "gold"]
+        },
+        {
+          "name": "Investing.com",
+          "url": "https://www.investing.com/rss/news.rss",
+          "priority": "high",
+          "keywords": ["breaking", "market", "stocks"]
+        },
+        {
+          "name": "Business Insider",
+          "url": "https://markets.businessinsider.com/rss/news",
+          "priority": "medium",
+          "keywords": ["stocks", "market"]
+        },
+        {
+          "name": "The Motley Fool",
+          "url": "https://www.fool.com/feeds/index.aspx",
+          "priority": "medium",
+          "keywords": ["analysis", "earnings"]
+        }
+      ],
+      "commodities": [
+        {
+          "name": "Kitco Gold News",
+          "url": "https://www.kitco.com/rss/KitcoNews.xml",
+          "priority": "high",
+          "keywords": ["silver", "gold", "precious metals"]
+        },
+        {
+          "name": "Mining.com",
+          "url": "https://www.mining.com/feed/",
+          "priority": "medium",
+          "keywords": ["silver", "mining", "commodities"]
+        }
+      ],
+      "crypto": [
+        {
+          "name": "CoinDesk",
+          "url": "https://www.coindesk.com/arc/outboundfeeds/rss/",
+          "priority": "high",
+          "keywords": ["bitcoin", "ethereum", "crypto"]
+        },
+        {
+          "name": "Cointelegraph",
+          "url": "https://cointelegraph.com/rss",
+          "priority": "medium",
+          "keywords": ["cryptocurrency", "blockchain"]
+        }
+      ],
+      "tech": [
+        {
+          "name": "TechCrunch",
+          "url": "https://techcrunch.com/feed/",
+          "priority": "medium",
+          "keywords": ["AI", "nvidia", "amd", "tech"]
+        },
+        {
+          "name": "The Verge",
+          "url": "https://www.theverge.com/rss/index.xml",
+          "priority": "low",
+          "keywords": ["technology", "AI"]
+        }
+      ]
+    },
+    "twitter_accounts": {
+      "market_movers": [
+        "@DeItaone",
+        "@FirstSquawk",
+        "@zerohedge",
+        "@Fxhedgers"
+      ],
+      "analysts": [
+        "@garyblack00",
+        "@danives",
+        "@elonmusk"
+      ],
+      "commodities": [
+        "@KitcoNews",
+        "@GoldTelegraph"
+      ]
+    },
+    "reddit_subreddits": [
+      "wallstreetbets",
+      "stocks",
+      "investing",
+      "Silverbugs",
+      "CryptoCurrency"
+    ]
+  },
+  "update_intervals": {
+    "rss": 300,
+    "twitter": 60,
+    "reddit": 600
+  },
+  "sentiment_keywords": {
+    "positive": [
+      "surge", "rally", "breakthrough", "bullish", "soar", 
+      "record high", "outperform", "upgrade", "beat expectations",
+      "strong demand", "shortage", "buy", "opportunity"
+    ],
+    "negative": [
+      "crash", "plunge", "decline", "bearish", "collapse",
+      "downgrade", "miss", "weak", "concern", "risk",
+      "oversupply", "sell", "warning"
+    ],
+    "neutral": [
+      "stable", "unchanged", "flat", "mixed", "holds"
+    ]
+  }
+}
