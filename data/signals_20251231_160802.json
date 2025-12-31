@@ -1,0 +1,362 @@
+[
+  {
+    "symbol": "MSTR",
+    "decision": "HOLD",
+    "combined_score": 58.52,
+    "confidence": 57.25,
+    "sentiment": {
+      "score": 0.651,
+      "label": "positive",
+      "confidence": 29.5,
+      "news_count": 27
+    },
+    "technical": {
+      "score": 85,
+      "decision": "STRONG BUY",
+      "rsi": 22.034174782700305,
+      "trend": "neutral"
+    },
+    "price": {
+      "current": 155.61000061035156,
+      "change_1d": 0.14158003833404376,
+      "change_5d": -5.3006367609767295
+    },
+    "timestamp": "2025-12-31T16:08:02.758143"
+  },
+  {
+    "symbol": "META",
+    "decision": "HOLD",
+    "combined_score": 58.0,
+    "confidence": 41.25,
+    "sentiment": {
+      "score": 1.0,
+      "label": "positive",
+      "confidence": 22.5,
+      "news_count": 4
+    },
+    "technical": {
+      "score": 60,
+      "decision": "BUY",
+      "rsi": 55.636261200255696,
+      "trend": "neutral"
+    },
+    "price": {
+      "current": 665.9500122070312,
+      "change_1d": 1.1021891540354378,
+      "change_5d": 0.6727153752125847
+    },
+    "timestamp": "2025-12-31T16:08:02.758158"
+  },
+  {
+    "symbol": "AMD",
+    "decision": "HOLD",
+    "combined_score": 52.88,
+    "confidence": 43.45,
+    "sentiment": {
+      "score": 0.744,
+      "label": "positive",
+      "confidence": 26.9,
+      "news_count": 47
+    },
+    "technical": {
+      "score": 60,
+      "decision": "BUY",
+      "rsi": 42.972242504301356,
+      "trend": "neutral"
+    },
+    "price": {
+      "current": 215.33999633789062,
+      "change_1d": -0.1252280838999198,
+      "change_5d": 0.18143726224026935
+    },
+    "timestamp": "2025-12-31T16:08:02.758119"
+  },
+  {
+    "symbol": "NVDA",
+    "decision": "HOLD",
+    "combined_score": 49.120000000000005,
+    "confidence": 42.4,
+    "sentiment": {
+      "score": 0.556,
+      "label": "positive",
+      "confidence": 24.8,
+      "news_count": 127
+    },
+    "technical": {
+      "score": 60,
+      "decision": "BUY",
+      "rsi": 52.97383900267356,
+      "trend": "neutral"
+    },
+    "price": {
+      "current": 187.5399932861328,
+      "change_1d": -0.3612835671873982,
+      "change_5d": 2.095917466142261
+    },
+    "timestamp": "2025-12-31T16:08:02.758104"
+  },
+  {
+    "symbol": "PLTR",
+    "decision": "HOLD",
+    "combined_score": 43.440000000000005,
+    "confidence": 34.3,
+    "sentiment": {
+      "score": 0.572,
+      "label": "positive",
+      "confidence": 28.6,
+      "news_count": 47
+    },
+    "technical": {
+      "score": 40,
+      "decision": "HOLD",
+      "rsi": 49.105546007822106,
+      "trend": "neutral"
+    },
+    "price": {
+      "current": 180.83999633789062,
+      "change_1d": -1.8134414543984345,
+      "change_5d": -6.773894050448714
+    },
+    "timestamp": "2025-12-31T16:08:02.758126"
+  },
+  {
+    "symbol": "BTC-USD",
+    "decision": "SELL",
+    "combined_score": 38.0,
+    "confidence": 30.0,
+    "sentiment": {
+      "score": 0.0,
+      "label": "neutral",
+      "confidence": 0.0,
+      "news_count": 2
+    },
+    "technical": {
+      "score": 60,
+      "decision": "BUY",
+      "rsi": 65.05014735131519,
+      "trend": "neutral"
+    },
+    "price": {
+      "current": 88696.40625,
+      "change_1d": 0.3011116562095184,
+      "change_5d": 1.5978851291363672
+    },
+    "timestamp": "2025-12-31T16:08:02.758138"
+  },
+  {
+    "symbol": "ETH-USD",
+    "decision": "SELL",
+    "combined_score": 38.0,
+    "confidence": 30.0,
+    "sentiment": {
+      "score": 0,
+      "label": "neutral",
+      "confidence": 0,
+      "news_count": 0
+    },
+    "technical": {
+      "score": 60,
+      "decision": "BUY",
+      "rsi": 69.46729802808173,
+      "trend": "neutral"
+    },
+    "price": {
+      "current": 2986.014404296875,
+      "change_1d": 0.49126923241564757,
+      "change_5d": 2.0599466582286396
+    },
+    "timestamp": "2025-12-31T16:08:02.758162"
+  },
+  {
+    "symbol": "ORCL",
+    "decision": "SELL",
+    "combined_score": 38.0,
+    "confidence": 30.0,
+    "sentiment": {
+      "score": 0,
+      "label": "neutral",
+      "confidence": 0,
+      "news_count": 0
+    },
+    "technical": {
+      "score": 60,
+      "decision": "BUY",
+      "rsi": 35.44410221453377,
+      "trend": "neutral"
+    },
+    "price": {
+      "current": 197.2100067138672,
+      "change_1d": 0.9366372122635136,
+      "change_5d": -0.5897762577616872
+    },
+    "timestamp": "2025-12-31T16:08:02.758171"
+  },
+  {
+    "symbol": "MSFT",
+    "decision": "SELL",
+    "combined_score": 38.0,
+    "confidence": 30.0,
+    "sentiment": {
+      "score": 0,
+      "label": "neutral",
+      "confidence": 0,
+      "news_count": 0
+    },
+    "technical": {
+      "score": 60,
+      "decision": "BUY",
+      "rsi": 44.847959284035134,
+      "trend": "neutral"
+    },
+    "price": {
+      "current": 487.4800109863281,
+      "change_1d": 0.07801372984006516,
+      "change_5d": 0.5279216134013609
+    },
+    "timestamp": "2025-12-31T16:08:02.758180"
+  },
+  {
+    "symbol": "TSM",
+    "decision": "SELL",
+    "combined_score": 38.0,
+    "confidence": 30.0,
+    "sentiment": {
+      "score": 0,
+      "label": "neutral",
+      "confidence": 0,
+      "news_count": 0
+    },
+    "technical": {
+      "score": 60,
+      "decision": "BUY",
+      "rsi": 47.79086740908534,
+      "trend": "neutral"
+    },
+    "price": {
+      "current": 299.5799865722656,
+      "change_1d": -0.44530998128197163,
+      "change_5d": 2.1481136863034767
+    },
+    "timestamp": "2025-12-31T16:08:02.758184"
+  },
+  {
+    "symbol": "TSLA",
+    "decision": "SELL",
+    "combined_score": 32.0,
+    "confidence": 20.0,
+    "sentiment": {
+      "score": 0,
+      "label": "neutral",
+      "confidence": 0,
+      "news_count": 0
+    },
+    "technical": {
+      "score": 40,
+      "decision": "HOLD",
+      "rsi": 53.3904443039539,
+      "trend": "neutral"
+    },
+    "price": {
+      "current": 454.42999267578125,
+      "change_1d": -1.1335005235871831,
+      "change_5d": -7.018193591452359
+    },
+    "timestamp": "2025-12-31T16:08:02.758148"
+  },
+  {
+    "symbol": "AAPL",
+    "decision": "SELL",
+    "combined_score": 32.0,
+    "confidence": 20.0,
+    "sentiment": {
+      "score": 0,
+      "label": "neutral",
+      "confidence": 0,
+      "news_count": 0
+    },
+    "technical": {
+      "score": 40,
+      "decision": "HOLD",
+      "rsi": 39.13046292355912,
+      "trend": "neutral"
+    },
+    "price": {
+      "current": 273.0799865722656,
+      "change_1d": -0.24840121606569676,
+      "change_5d": 0.778678577723424
+    },
+    "timestamp": "2025-12-31T16:08:02.758153"
+  },
+  {
+    "symbol": "CVNA",
+    "decision": "SELL",
+    "combined_score": 32.0,
+    "confidence": 20.0,
+    "sentiment": {
+      "score": 0,
+      "label": "neutral",
+      "confidence": 0,
+      "news_count": 0
+    },
+    "technical": {
+      "score": 40,
+      "decision": "HOLD",
+      "rsi": 39.626587556118146,
+      "trend": "neutral"
+    },
+    "price": {
+      "current": 429.54998779296875,
+      "change_1d": -0.9226156412464492,
+      "change_5d": -0.9317577847837488
+    },
+    "timestamp": "2025-12-31T16:08:02.758187"
+  },
+  {
+    "symbol": "ASELS.IS",
+    "decision": "SELL",
+    "combined_score": 30.5,
+    "confidence": 17.5,
+    "sentiment": {
+      "score": 0,
+      "label": "neutral",
+      "confidence": 0,
+      "news_count": 0
+    },
+    "technical": {
+      "score": 35,
+      "decision": "SELL",
+      "rsi": 71.88873193213124,
+      "trend": "neutral"
+    },
+    "price": {
+      "current": 234.8000030517578,
+      "change_1d": 2.5327524243483834,
+      "change_5d": 4.4948848423180365
+    },
+    "timestamp": "2025-12-31T16:08:02.758167"
+  },
+  {
+    "symbol": "SLV",
+    "decision": "SELL",
+    "combined_score": 29.080000000000002,
+    "confidence": 40.55,
+    "sentiment": {
+      "score": -0.221,
+      "label": "neutral",
+      "confidence": 36.1,
+      "news_count": 9
+    },
+    "technical": {
+      "score": 45,
+      "decision": "HOLD",
+      "rsi": 73.24133636351965,
+      "trend": "neutral"
+    },
+    "price": {
+      "current": 68.9800033569336,
+      "change_1d": 4.499319988770312,
+      "change_5d": 10.421005296976048
+    },
+    "timestamp": "2025-12-31T16:08:02.758132"
+  }
+]

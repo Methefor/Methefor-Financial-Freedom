@@ -1,0 +1,744 @@
+{
+  "NVDA": {
+    "symbol": "NVDA",
+    "timestamp": "2025-12-30T20:21:57.248752",
+    "price": {
+      "current": 187.8699951171875,
+      "change_1d": -0.18595585019958172,
+      "change_5d": 2.275568958694185
+    },
+    "rsi": {
+      "value": 53.38152234871453,
+      "signal": "neutral"
+    },
+    "macd": {
+      "macd_line": 0.8672720287534901,
+      "signal_line": -0.6452602946060007,
+      "histogram": 1.5125323233594907,
+      "signal": "bullish"
+    },
+    "moving_averages": {
+      "ma_20": 182.26399612426758,
+      "ma_50": 186.28008666992187,
+      "ma_200": NaN,
+      "trend": "neutral"
+    },
+    "volume": {
+      "current_volume": 49536004,
+      "avg_volume": 163651010.2,
+      "volume_ratio": 0.30269293137550096,
+      "volume_trend": "decreasing",
+      "volume_spike": false
+    },
+    "bollinger_bands": {
+      "upper_band": 193.13916411194066,
+      "middle_band": 182.26399612426758,
+      "lower_band": 171.3888281365945,
+      "current_price": 187.8699951171875,
+      "bb_position": 75.77430987399127,
+      "oversold": false,
+      "overbought": false
+    },
+    "technical_signals": {
+      "decision": "BUY",
+      "score": 60,
+      "signals": [
+        "MACD bullish"
+      ]
+    },
+    "overall_score": 60
+  },
+  "AMD": {
+    "symbol": "AMD",
+    "timestamp": "2025-12-30T20:21:57.979635",
+    "price": {
+      "current": 215.03199768066406,
+      "change_1d": -0.2680779778541309,
+      "change_5d": 0.03814874788838907
+    },
+    "rsi": {
+      "value": 42.67804395096751,
+      "signal": "neutral"
+    },
+    "macd": {
+      "macd_line": -2.4350747539780286,
+      "signal_line": -3.5167105015686744,
+      "histogram": 1.0816357475906457,
+      "signal": "bullish"
+    },
+    "moving_averages": {
+      "ma_20": 214.1510986328125,
+      "ma_50": 228.440439453125,
+      "ma_200": NaN,
+      "trend": "neutral"
+    },
+    "volume": {
+      "current_volume": 8453993,
+      "avg_volume": 27181754.65,
+      "volume_ratio": 0.3110171918206171,
+      "volume_trend": "decreasing",
+      "volume_spike": false
+    },
+    "bollinger_bands": {
+      "upper_band": 226.7602480940058,
+      "middle_band": 214.1510986328125,
+      "lower_band": 201.54194917161922,
+      "current_price": 215.03199768066406,
+      "bb_position": 53.49309463958163,
+      "oversold": false,
+      "overbought": false
+    },
+    "technical_signals": {
+      "decision": "BUY",
+      "score": 60,
+      "signals": [
+        "MACD bullish"
+      ]
+    },
+    "overall_score": 60
+  },
+  "PLTR": {
+    "symbol": "PLTR",
+    "timestamp": "2025-12-30T20:21:58.753353",
+    "price": {
+      "current": 183.31500244140625,
+      "change_1d": -0.46964397262067026,
+      "change_5d": -5.497986143433408
+    },
+    "rsi": {
+      "value": 51.38044510807817,
+      "signal": "neutral"
+    },
+    "macd": {
+      "macd_line": 2.9809973480325596,
+      "signal_line": 3.055733770178452,
+      "histogram": -0.0747364221458926,
+      "signal": "bearish"
+    },
+    "moving_averages": {
+      "ma_20": 184.73225021362305,
+      "ma_50": 181.335,
+      "ma_200": NaN,
+      "trend": "neutral"
+    },
+    "volume": {
+      "current_volume": 11637667,
+      "avg_volume": 34810043.35,
+      "volume_ratio": 0.3343192331876254,
+      "volume_trend": "decreasing",
+      "volume_spike": false
+    },
+    "bollinger_bands": {
+      "upper_band": 197.61989960155026,
+      "middle_band": 184.73225021362305,
+      "lower_band": 171.84460082569584,
+      "current_price": 183.31500244140625,
+      "bb_position": 44.50152727795173,
+      "oversold": false,
+      "overbought": false
+    },
+    "technical_signals": {
+      "decision": "HOLD",
+      "score": 40,
+      "signals": [
+        "MACD bearish"
+      ]
+    },
+    "overall_score": 40
+  },
+  "SLV": {
+    "symbol": "SLV",
+    "timestamp": "2025-12-30T20:21:59.526153",
+    "price": {
+      "current": 70.06999969482422,
+      "change_1d": 6.150579347376461,
+      "change_5d": 12.165836922702656
+    },
+    "rsi": {
+      "value": 74.18831176873623,
+      "signal": "overbought"
+    },
+    "macd": {
+      "macd_line": 5.052244197761674,
+      "signal_line": 4.154870598801484,
+      "histogram": 0.8973735989601899,
+      "signal": "bullish"
+    },
+    "moving_averages": {
+      "ma_20": 59.23299980163574,
+      "ma_50": 51.01979995727539,
+      "ma_200": NaN,
+      "trend": "neutral"
+    },
+    "volume": {
+      "current_volume": 63386245,
+      "avg_volume": 61098647.25,
+      "volume_ratio": 1.0374410539834007,
+      "volume_trend": "increasing",
+      "volume_spike": false
+    },
+    "bollinger_bands": {
+      "upper_band": 70.85804295595791,
+      "middle_band": 59.23299980163574,
+      "lower_band": 47.60795664731357,
+      "current_price": 70.06999969482422,
+      "bb_position": 96.61057920098688,
+      "oversold": false,
+      "overbought": true
+    },
+    "technical_signals": {
+      "decision": "SELL",
+      "score": 35,
+      "signals": [
+        "RSI overbought (bearish)",
+        "MACD bullish",
+        "BB overbought"
+      ]
+    },
+    "overall_score": 35
+  },
+  "BTC-USD": {
+    "symbol": "BTC-USD",
+    "timestamp": "2025-12-30T20:22:00.351289",
+    "price": {
+      "current": 88518.8828125,
+      "change_1d": 1.5845440097718377,
+      "change_5d": 1.4720518371452274
+    },
+    "rsi": {
+      "value": 53.37341954550389,
+      "signal": "neutral"
+    },
+    "macd": {
+      "macd_line": -977.4483422032645,
+      "signal_line": -1257.7312447468848,
+      "histogram": 280.28290254362037,
+      "signal": "bullish"
+    },
+    "moving_averages": {
+      "ma_20": 88077.0984375,
+      "ma_50": 90141.00390625,
+      "ma_200": NaN,
+      "trend": "neutral"
+    },
+    "volume": {
+      "current_volume": 35459674112,
+      "avg_volume": 40348520014.95,
+      "volume_ratio": 0.8788345668902211,
+      "volume_trend": "decreasing",
+      "volume_spike": false
+    },
+    "bollinger_bands": {
+      "upper_band": 91206.25429965442,
+      "middle_band": 88077.0984375,
+      "lower_band": 84947.94257534557,
+      "current_price": 88518.8828125,
+      "bb_position": 57.059162190403555,
+      "oversold": false,
+      "overbought": false
+    },
+    "technical_signals": {
+      "decision": "BUY",
+      "score": 60,
+      "signals": [
+        "MACD bullish"
+      ]
+    },
+    "overall_score": 60
+  },
+  "MSTR": {
+    "symbol": "MSTR",
+    "timestamp": "2025-12-30T20:22:01.162602",
+    "price": {
+      "current": 157.4499969482422,
+      "change_1d": 1.3256950683346203,
+      "change_5d": -4.18087272989307
+    },
+    "rsi": {
+      "value": 24.366048295365758,
+      "signal": "oversold"
+    },
+    "macd": {
+      "macd_line": -14.057104118941169,
+      "signal_line": -15.627035585458678,
+      "histogram": 1.5699314665175095,
+      "signal": "bullish"
+    },
+    "moving_averages": {
+      "ma_20": 170.86850204467774,
+      "ma_50": 208.2230010986328,
+      "ma_200": NaN,
+      "trend": "neutral"
+    },
+    "volume": {
+      "current_volume": 6393644,
+      "avg_volume": 18628587.2,
+      "volume_ratio": 0.34321679531338806,
+      "volume_trend": "decreasing",
+      "volume_spike": false
+    },
+    "bollinger_bands": {
+      "upper_band": 195.57271303532372,
+      "middle_band": 170.86850204467774,
+      "lower_band": 146.16429105403176,
+      "current_price": 157.4499969482422,
+      "bb_position": 22.841664318855706,
+      "oversold": false,
+      "overbought": false
+    },
+    "technical_signals": {
+      "decision": "STRONG BUY",
+      "score": 75,
+      "signals": [
+        "RSI oversold (bullish)",
+        "MACD bullish"
+      ]
+    },
+    "overall_score": 75
+  },
+  "TSLA": {
+    "symbol": "TSLA",
+    "timestamp": "2025-12-30T20:22:01.915738",
+    "price": {
+      "current": 462.010498046875,
+      "change_1d": 0.5157260732076674,
+      "change_5d": -5.467131614350684
+    },
+    "rsi": {
+      "value": 56.296900485673426,
+      "signal": "neutral"
+    },
+    "macd": {
+      "macd_line": 10.087193112475802,
+      "signal_line": 11.458128943492387,
+      "histogram": -1.3709358310165847,
+      "signal": "bearish"
+    },
+    "moving_averages": {
+      "ma_20": 464.05552673339844,
+      "ma_50": 445.2084118652344,
+      "ma_200": NaN,
+      "trend": "neutral"
+    },
+    "volume": {
+      "current_volume": 33203498,
+      "avg_volume": 75153969.9,
+      "volume_ratio": 0.4418063083584357,
+      "volume_trend": "decreasing",
+      "volume_spike": false
+    },
+    "bollinger_bands": {
+      "upper_band": 500.37357304392106,
+      "middle_band": 464.05552673339844,
+      "lower_band": 427.7374804228758,
+      "current_price": 462.010498046875,
+      "bb_position": 47.18455575908702,
+      "oversold": false,
+      "overbought": false
+    },
+    "technical_signals": {
+      "decision": "HOLD",
+      "score": 40,
+      "signals": [
+        "MACD bearish"
+      ]
+    },
+    "overall_score": 40
+  },
+  "AAPL": {
+    "symbol": "AAPL",
+    "timestamp": "2025-12-30T20:22:02.750872",
+    "price": {
+      "current": 272.510009765625,
+      "change_1d": -0.4566043086680849,
+      "change_5d": 0.5683317481581796
+    },
+    "rsi": {
+      "value": 37.98257848477423,
+      "signal": "neutral"
+    },
+    "macd": {
+      "macd_line": -0.06701364855592828,
+      "signal_line": 0.6533770918559708,
+      "histogram": -0.7203907404118991,
+      "signal": "bearish"
+    },
+    "moving_averages": {
+      "ma_20": 276.1604995727539,
+      "ma_50": 272.3808709716797,
+      "ma_200": NaN,
+      "trend": "neutral"
+    },
+    "volume": {
+      "current_volume": 8344533,
+      "avg_volume": 41841881.65,
+      "volume_ratio": 0.1994301563634388,
+      "volume_trend": "decreasing",
+      "volume_spike": false
+    },
+    "bollinger_bands": {
+      "upper_band": 284.51618779615984,
+      "middle_band": 276.1604995727539,
+      "lower_band": 267.804811349348,
+      "current_price": 272.510009765625,
+      "bb_position": 28.15566049422977,
+      "oversold": false,
+      "overbought": false
+    },
+    "technical_signals": {
+      "decision": "HOLD",
+      "score": 40,
+      "signals": [
+        "MACD bearish"
+      ]
+    },
+    "overall_score": 40
+  },
+  "META": {
+    "symbol": "META",
+    "timestamp": "2025-12-30T20:22:03.647029",
+    "price": {
+      "current": 665.5460205078125,
+      "change_1d": 1.0408565548277293,
+      "change_5d": 0.6116433118386277
+    },
+    "rsi": {
+      "value": 55.42314179626602,
+      "signal": "neutral"
+    },
+    "macd": {
+      "macd_line": 4.3960854461374765,
+      "signal_line": 2.858620985997901,
+      "histogram": 1.5374644601395757,
+      "signal": "bullish"
+    },
+    "moving_averages": {
+      "ma_20": 657.3287109375,
+      "ma_50": 654.8900122070313,
+      "ma_200": NaN,
+      "trend": "neutral"
+    },
+    "volume": {
+      "current_volume": 5053384,
+      "avg_volume": 15507379.2,
+      "volume_ratio": 0.3258696350186626,
+      "volume_trend": "decreasing",
+      "volume_spike": false
+    },
+    "bollinger_bands": {
+      "upper_band": 675.4008581048749,
+      "middle_band": 657.3287109375,
+      "lower_band": 639.256563770125,
+      "current_price": 665.5460205078125,
+      "bb_position": 72.73473509873513,
+      "oversold": false,
+      "overbought": false
+    },
+    "technical_signals": {
+      "decision": "BUY",
+      "score": 60,
+      "signals": [
+        "MACD bullish"
+      ]
+    },
+    "overall_score": 60
+  },
+  "ETH-USD": {
+    "symbol": "ETH-USD",
+    "timestamp": "2025-12-30T20:22:04.490353",
+    "price": {
+      "current": 2973.577880859375,
+      "change_1d": 1.3303472774952807,
+      "change_5d": 2.410758474142316
+    },
+    "rsi": {
+      "value": 50.9080168760445,
+      "signal": "neutral"
+    },
+    "macd": {
+      "macd_line": -41.70644937657744,
+      "signal_line": -48.18059298449259,
+      "histogram": 6.474143607915153,
+      "signal": "bullish"
+    },
+    "moving_averages": {
+      "ma_20": 2979.578466796875,
+      "ma_50": 3026.8816943359375,
+      "ma_200": NaN,
+      "trend": "neutral"
+    },
+    "volume": {
+      "current_volume": 18779822080,
+      "avg_volume": 18999951118.3,
+      "volume_ratio": 0.9884142313351544,
+      "volume_trend": "decreasing",
+      "volume_spike": false
+    },
+    "bollinger_bands": {
+      "upper_band": 3165.163179405007,
+      "middle_band": 2979.578466796875,
+      "lower_band": 2793.993754188743,
+      "current_price": 2973.577880859375,
+      "bb_position": 48.383329679160994,
+      "oversold": false,
+      "overbought": false
+    },
+    "technical_signals": {
+      "decision": "BUY",
+      "score": 60,
+      "signals": [
+        "MACD bullish"
+      ]
+    },
+    "overall_score": 60
+  },
+  "ASELS.IS": {
+    "symbol": "ASELS.IS",
+    "timestamp": "2025-12-30T20:22:05.307407",
+    "price": {
+      "current": 229.0,
+      "change_1d": 3.619909502262453,
+      "change_5d": 3.292739355996499
+    },
+    "rsi": {
+      "value": 68.29652491959655,
+      "signal": "neutral"
+    },
+    "macd": {
+      "macd_line": 8.68831751360861,
+      "signal_line": 6.612594727167856,
+      "histogram": 2.0757227864407533,
+      "signal": "bullish"
+    },
+    "moving_averages": {
+      "ma_20": 208.27999954223634,
+      "ma_50": 198.23977661132812,
+      "ma_200": NaN,
+      "trend": "neutral"
+    },
+    "volume": {
+      "current_volume": 34829885,
+      "avg_volume": 28533726.7,
+      "volume_ratio": 1.2206567114838176,
+      "volume_trend": "stable",
+      "volume_spike": false
+    },
+    "bollinger_bands": {
+      "upper_band": 235.06747606222734,
+      "middle_band": 208.27999954223634,
+      "lower_band": 181.49252302224534,
+      "current_price": 229.0,
+      "bb_position": 88.67478977032552,
+      "oversold": false,
+      "overbought": true
+    },
+    "technical_signals": {
+      "decision": "HOLD",
+      "score": 50,
+      "signals": [
+        "MACD bullish",
+        "BB overbought"
+      ]
+    },
+    "overall_score": 50
+  },
+  "BYDDY": {
+    "symbol": "BYDDY",
+    "timestamp": "2025-12-30T20:22:06.121377",
+    "price": {
+      "current": 12.539999961853027,
+      "change_1d": 0.64205396036221,
+      "change_5d": 4.499999682108569
+    },
+    "rsi": {
+      "value": 51.388887969063845,
+      "signal": "neutral"
+    },
+    "macd": {
+      "macd_line": -0.09554812956011638,
+      "signal_line": -0.1523909597133531,
+      "histogram": 0.05684283015323671,
+      "signal": "bullish"
+    },
+    "moving_averages": {
+      "ma_20": 12.35,
+      "ma_50": 12.607999935150147,
+      "ma_200": NaN,
+      "trend": "neutral"
+    },
+    "volume": {
+      "current_volume": 255042,
+      "avg_volume": 1404877.1,
+      "volume_ratio": 0.18154043510282855,
+      "volume_trend": "stable",
+      "volume_spike": false
+    },
+    "bollinger_bands": {
+      "upper_band": 12.91210141685779,
+      "middle_band": 12.35,
+      "lower_band": 11.787898583142209,
+      "current_price": 12.539999961853027,
+      "bb_position": 66.90086131744236,
+      "oversold": false,
+      "overbought": false
+    },
+    "technical_signals": {
+      "decision": "BUY",
+      "score": 60,
+      "signals": [
+        "MACD bullish"
+      ]
+    },
+    "overall_score": 60
+  },
+  "AVGO": {
+    "symbol": "AVGO",
+    "timestamp": "2025-12-30T20:22:06.919580",
+    "price": {
+      "current": 350.5,
+      "change_1d": 0.3176923509618401,
+      "change_5d": 2.6504575983091305
+    },
+    "rsi": {
+      "value": 28.342290190643382,
+      "signal": "oversold"
+    },
+    "macd": {
+      "macd_line": -5.641527023013168,
+      "signal_line": -3.969826449891227,
+      "histogram": -1.6717005731219414,
+      "signal": "bearish"
+    },
+    "moving_averages": {
+      "ma_20": 364.02820892333983,
+      "ma_50": 361.1670428466797,
+      "ma_200": NaN,
+      "trend": "neutral"
+    },
+    "volume": {
+      "current_volume": 5696272,
+      "avg_volume": 41691173.6,
+      "volume_ratio": 0.13663016672670494,
+      "volume_trend": "decreasing",
+      "volume_spike": false
+    },
+    "bollinger_bands": {
+      "upper_band": 419.2213540906109,
+      "middle_band": 364.02820892333983,
+      "lower_band": 308.8350637560688,
+      "current_price": 350.5,
+      "bb_position": 37.7446656805473,
+      "oversold": false,
+      "overbought": false
+    },
+    "technical_signals": {
+      "decision": "HOLD",
+      "score": 55,
+      "signals": [
+        "RSI oversold (bullish)",
+        "MACD bearish"
+      ]
+    },
+    "overall_score": 55
+  },
+  "NIO": {
+    "symbol": "NIO",
+    "timestamp": "2025-12-30T20:22:07.652336",
+    "price": {
+      "current": 5.59499979019165,
+      "change_1d": 4.775273975978833,
+      "change_5d": 11.899995803833008
+    },
+    "rsi": {
+      "value": 70.10673680638045,
+      "signal": "overbought"
+    },
+    "macd": {
+      "macd_line": -0.16583935759316937,
+      "signal_line": -0.28493482156629896,
+      "histogram": 0.11909546397312959,
+      "signal": "bullish"
+    },
+    "moving_averages": {
+      "ma_20": 5.041250014305115,
+      "ma_50": 5.90210000038147,
+      "ma_200": NaN,
+      "trend": "neutral"
+    },
+    "volume": {
+      "current_volume": 51273316,
+      "avg_volume": 38116025.8,
+      "volume_ratio": 1.3451905051444268,
+      "volume_trend": "stable",
+      "volume_spike": false
+    },
+    "bollinger_bands": {
+      "upper_band": 5.3869586550099795,
+      "middle_band": 5.041250014305115,
+      "lower_band": 4.695541373600251,
+      "current_price": 5.59499979019165,
+      "bb_position": 130.08908524205475,
+      "oversold": false,
+      "overbought": true
+    },
+    "technical_signals": {
+      "decision": "SELL",
+      "score": 35,
+      "signals": [
+        "RSI overbought (bearish)",
+        "MACD bullish",
+        "BB overbought"
+      ]
+    },
+    "overall_score": 35
+  },
+  "WMT": {
+    "symbol": "WMT",
+    "timestamp": "2025-12-30T20:22:08.553879",
+    "price": {
+      "current": 112.19550323486328,
+      "change_1d": -0.29725010935940377,
+      "change_5d": -0.35923201131372595
+    },
+    "rsi": {
+      "value": 40.63966560984231,
+      "signal": "neutral"
+    },
+    "macd": {
+      "macd_line": 1.1380031274709808,
+      "signal_line": 1.8488035945791492,
+      "histogram": -0.7108004671081685,
+      "signal": "bearish"
+    },
+    "moving_averages": {
+      "ma_20": 113.87829818725587,
+      "ma_50": 108.03295333862305,
+      "ma_200": NaN,
+      "trend": "neutral"
+    },
+    "volume": {
+      "current_volume": 3781078,
+      "avg_volume": 20311833.9,
+      "volume_ratio": 0.18615148285551902,
+      "volume_trend": "decreasing",
+      "volume_spike": false
+    },
+    "bollinger_bands": {
+      "upper_band": 117.32825907088213,
+      "middle_band": 113.87829818725587,
+      "lower_band": 110.4283373036296,
+      "current_price": 112.19550323486328,
+      "bb_position": 25.611390836643423,
+      "oversold": false,
+      "overbought": false
+    },
+    "technical_signals": {
+      "decision": "HOLD",
+      "score": 40,
+      "signals": [
+        "MACD bearish"
+      ]
+    },
+    "overall_score": 40
+  }
+}
