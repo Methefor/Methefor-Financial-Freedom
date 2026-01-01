@@ -528,6 +528,142 @@
           grid-template-columns: repeat(2, 1fr);
         }
       }
+      /* TOAST NOTIFICATIONS */
+      .toast-container {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 100000;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .toast {
+        background: rgba(15, 23, 42, 0.95);
+        backdrop-filter: blur(10px);
+        color: white;
+        padding: 16px 20px;
+        border-radius: 12px;
+        border-left: 4px solid var(--gold);
+        min-width: 300px;
+        max-width: 400px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        animation: slideInRight 0.3s ease-out;
+      }
+
+      .toast.success {
+        border-left-color: var(--success);
+      }
+      .toast.error {
+        border-left-color: var(--danger);
+      }
+      .toast.info {
+        border-left-color: var(--info);
+      }
+      .toast.warning {
+        border-left-color: var(--warning);
+      }
+
+      .toast-icon {
+        font-size: 1.5em;
+        flex-shrink: 0;
+      }
+
+      .toast-content {
+        flex: 1;
+      }
+
+      .toast-title {
+        font-weight: bold;
+        margin-bottom: 4px;
+      }
+
+      .toast-message {
+        font-size: 0.9em;
+        color: #94a3b8;
+      }
+
+      .toast-close {
+        cursor: pointer;
+        opacity: 0.6;
+        transition: opacity 0.2s;
+        font-size: 1.2em;
+      }
+
+      .toast-close:hover {
+        opacity: 1;
+      }
+
+      @keyframes slideInRight {
+        from {
+          transform: translateX(400px);
+          opacity: 0;
+        }
+        to {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+
+      @keyframes slideOutRight {
+        from {
+          transform: translateX(0);
+          opacity: 1;
+        }
+        to {
+          transform: translateX(400px);
+          opacity: 0;
+        }
+      }
+
+      /* LOADING SKELETON */
+      .skeleton {
+        background: linear-gradient(
+          90deg,
+          rgba(255, 255, 255, 0.05) 25%,
+          rgba(255, 255, 255, 0.1) 50%,
+          rgba(255, 255, 255, 0.05) 75%
+        );
+        background-size: 200% 100%;
+        animation: shimmer 1.5s infinite;
+        border-radius: 8px;
+      }
+
+      @keyframes shimmer {
+        0% {
+          background-position: 200% 0;
+        }
+        100% {
+          background-position: -200% 0;
+        }
+      }
+
+      .skeleton-signal {
+        height: 120px;
+        margin-bottom: 15px;
+      }
+
+      .skeleton-news {
+        height: 80px;
+        margin-bottom: 12px;
+      }
+
+      .fade-in {
+        animation: fadeIn 0.5s ease-in;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
     </style>
   </head>
   <body>
@@ -620,7 +756,88 @@
 
       const socket = io();
       let currentSignals = [];
+      // TOAST NOTIFICATION SYSTEM
+      class ToastManager {
+        constructor() {
+          this.container = this.createContainer();
+        }
 
+        createContainer() {
+          let container = document.getElementById('toast-container');
+          if (!container) {
+            container = document.createElement('div');
+            container.id = 'toast-container';
+            container.className = 'toast-container';
+            document.body.appendChild(container);
+          }
+          return container;
+        }
+
+        show(message, type = 'info', duration = 4000) {
+          const icons = {
+            success: '✅',
+            error: '❌',
+            warning: '⚠️',
+            info: 'ℹ️',
+          };
+
+          const titles = {
+            success: 'Başarılı',
+            error: 'Hata',
+            warning: 'Uyarı',
+            info: 'Bilgi',
+          };
+
+          const toast = document.createElement('div');
+          toast.className = `toast ${type}`;
+          toast.innerHTML = `
+            <div class="toast-icon">${icons[type] || icons.info}</div>
+            <div class="toast-content">
+                <div class="toast-title">${titles[type]}</div>
+                <div class="toast-message">${message}</div>
+            </div>
+            <div class="toast-close" onclick="this.parentElement.remove()">×</div>
+        `;
+
+          this.container.appendChild(toast);
+
+          setTimeout(() => {
+            toast.style.animation = 'slideOutRight 0.3s ease-out';
+            setTimeout(() => toast.remove(), 300);
+          }, duration);
+        }
+
+        success(message, duration) {
+          this.show(message, 'success', duration);
+        }
+        error(message, duration) {
+          this.show(message, 'error', duration);
+        }
+        warning(message, duration) {
+          this.show(message, 'warning', duration);
+        }
+        info(message, duration) {
+          this.show(message, 'info', duration);
+        }
+      }
+
+      const toast = new ToastManager();
+
+      // LOADING SKELETON FUNCTION
+      function showLoading(containerId) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+
+        const skeletonClass = containerId.includes('signals')
+          ? 'skeleton-signal'
+          : 'skeleton-news';
+        const count = containerId.includes('signals') ? 5 : 10;
+
+        container.innerHTML = Array(count)
+          .fill(0)
+          .map(() => `<div class="skeleton ${skeletonClass}"></div>`)
+          .join('');
+      }
       socket.on('connect', () => {
         console.log('Connected');
         refreshData();
@@ -628,10 +845,19 @@
 
       async function refreshData() {
         try {
+          // EKLE: Loading göster
+          showLoading('signals-container');
+          showLoading('news-container');
+          toast.info('Veriler güncelleniyor...', 2000);
+
           const [summaryRes, newsRes] = await Promise.all([
             fetch('/api/summary'),
             fetch('/api/news?limit=10'),
           ]);
+
+          if (!summaryRes.ok || !newsRes.ok) {
+            throw new Error('API yanıt vermedi');
+          }
 
           const summaryData = await summaryRes.json();
           const newsData = await newsRes.json();
@@ -642,8 +868,13 @@
           updateStats(summary);
           updateSignals(summary.top_signals || summary.signals || []);
           updateNews(news);
+
+          // EKLE: Başarı toastu
+          toast.success('Veriler güncellendi!', 2000);
         } catch (error) {
           console.error('Error:', error);
+          // EKLE: Hata toastu
+          toast.error('Veri yüklenirken hata oluştu!', 5000);
         }
       }
 
@@ -1093,7 +1324,29 @@
       document.getElementById('signal-modal').addEventListener('click', (e) => {
         if (e.target.id === 'signal-modal') closeModal();
       });
+      // SOCKET EVENT HANDLERS
+      socket.on('connect', () => {
+        console.log('Connected to server');
+        toast.success('Bağlantı kuruldu!', 2000);
+      });
 
+      socket.on('disconnect', () => {
+        console.log('Disconnected from server');
+        toast.warning('Bağlantı kesildi! Yeniden bağlanılıyor...', 3000);
+      });
+
+      socket.on('new_signal', (data) => {
+        console.log('New signal:', data);
+        toast.warning(`Yeni Sinyal: ${data.symbol} - ${data.decision}`, 6000);
+        refreshData();
+      });
+
+      socket.on('discovery', (data) => {
+        console.log('Discovery:', data);
+        if (data.symbols && data.symbols.length > 0) {
+          toast.info(`Keşif: ${data.symbols.join(', ')} bulundu!`, 6000);
+        }
+      });
       window.addEventListener('load', () => {
         refreshData();
         setInterval(refreshData, 30000);
