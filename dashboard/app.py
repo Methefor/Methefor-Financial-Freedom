@@ -27,6 +27,9 @@ current_signals = []
 latest_news = []
 technical_data = {}
 
+# Watchlist dosya yolu
+WATCHLIST_FILE = BASE_DIR / 'config' / 'watchlist.json'
+
 
 def load_latest_data():
     """En son veriyi yükle"""
@@ -197,6 +200,188 @@ def handle_update_request():
         'news': latest_news[:20],
         'timestamp': datetime.now().isoformat()
     })
+
+
+# ==========================================
+# WATCHLIST API ENDPOINTS
+# ==========================================
+
+@app.route('/api/watchlist', methods=['GET'])
+def get_watchlist():
+    """Watchlist'i getir"""
+    try:
+        with open(WATCHLIST_FILE, 'r', encoding='utf-8') as f:
+            watchlist = json.load(f)
+        
+        all_symbols = []
+        
+        for category, symbols in watchlist.get('stocks', {}).items():
+            for symbol in symbols:
+                all_symbols.append({
+                    'symbol': symbol,
+                    'category': f'US_{category}',
+                    'type': 'stock',
+                    'market': 'US'
+                })
+        
+        for symbol in watchlist.get('turkish_stocks', []):
+            all_symbols.append({
+                'symbol': symbol,
+                'category': 'Turkish',
+                'type': 'stock',
+                'market': 'TR'
+            })
+        
+        for symbol in watchlist.get('commodities', []):
+            all_symbols.append({
+                'symbol': symbol,
+                'category': 'Commodities',
+                'type': 'commodity',
+                'market': 'GLOBAL'
+            })
+        
+        for symbol in watchlist.get('crypto', []):
+            all_symbols.append({
+                'symbol': symbol,
+                'category': 'Crypto',
+                'type': 'crypto',
+                'market': 'CRYPTO'
+            })
+        
+        return jsonify({
+            'success': True,
+            'watchlist': all_symbols,
+            'total': len(all_symbols),
+            'categories': {
+                'US': len([s for s in all_symbols if s['market'] == 'US']),
+                'TR': len([s for s in all_symbols if s['market'] == 'TR']),
+                'Commodities': len([s for s in all_symbols if s['type'] == 'commodity']),
+                'Crypto': len([s for s in all_symbols if s['type'] == 'crypto'])
+            }
+        })
+    
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/watchlist/add', methods=['POST'])
+def add_to_watchlist():
+    """Watchlist'e sembol ekle"""
+    try:
+        data = request.get_json()
+        symbol = data.get('symbol', '').upper().strip()
+        category = data.get('category', 'custom')
+        
+        if not symbol:
+            return jsonify({'success': False, 'error': 'Sembol boş olamaz'}), 400
+        
+        with open(WATCHLIST_FILE, 'r', encoding='utf-8') as f:
+            watchlist = json.load(f)
+        
+        all_current = []
+        for cat_symbols in watchlist.get('stocks', {}).values():
+            all_current.extend(cat_symbols)
+        all_current.extend(watchlist.get('turkish_stocks', []))
+        all_current.extend(watchlist.get('commodities', []))
+        all_current.extend(watchlist.get('crypto', []))
+        
+        if symbol in all_current:
+            return jsonify({'success': False, 'error': f'{symbol} zaten watchlist\'te'}), 400
+        
+        if category == 'crypto' or symbol.endswith('-USD'):
+            if 'crypto' not in watchlist:
+                watchlist['crypto'] = []
+            watchlist['crypto'].append(symbol)
+            added_category = 'Crypto'
+        
+        elif category == 'turkish' or symbol.endswith('.IS'):
+            if 'turkish_stocks' not in watchlist:
+                watchlist['turkish_stocks'] = []
+            watchlist['turkish_stocks'].append(symbol)
+            added_category = 'Turkish'
+        
+        elif category in ['SLV', 'GLD', 'GC=F', 'SI=F']:
+            if 'commodities' not in watchlist:
+                watchlist['commodities'] = []
+            watchlist['commodities'].append(symbol)
+            added_category = 'Commodities'
+        
+        else:
+            if 'stocks' not in watchlist:
+                watchlist['stocks'] = {}
+            if 'custom' not in watchlist['stocks']:
+                watchlist['stocks']['custom'] = []
+            watchlist['stocks']['custom'].append(symbol)
+            added_category = 'US_custom'
+        
+        with open(WATCHLIST_FILE, 'w', encoding='utf-8') as f:
+            json.dump(watchlist, f, indent=2, ensure_ascii=False)
+        
+        return jsonify({
+            'success': True,
+            'message': f'{symbol} başarıyla eklendi',
+            'symbol': symbol,
+            'category': added_category
+        })
+    
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/watchlist/remove', methods=['POST'])
+def remove_from_watchlist():
+    """Watchlist'ten sembol sil"""
+    try:
+        data = request.get_json()
+        symbol = data.get('symbol', '').upper().strip()
+        
+        if not symbol:
+            return jsonify({'success': False, 'error': 'Sembol boş olamaz'}), 400
+        
+        with open(WATCHLIST_FILE, 'r', encoding='utf-8') as f:
+            watchlist = json.load(f)
+        
+        removed = False
+        removed_from = ''
+        
+        if 'stocks' in watchlist:
+            for category, symbols in watchlist['stocks'].items():
+                if symbol in symbols:
+                    watchlist['stocks'][category].remove(symbol)
+                    removed = True
+                    removed_from = f'US_{category}'
+                    break
+        
+        if not removed and 'turkish_stocks' in watchlist and symbol in watchlist['turkish_stocks']:
+            watchlist['turkish_stocks'].remove(symbol)
+            removed = True
+            removed_from = 'Turkish'
+        
+        if not removed and 'commodities' in watchlist and symbol in watchlist['commodities']:
+            watchlist['commodities'].remove(symbol)
+            removed = True
+            removed_from = 'Commodities'
+        
+        if not removed and 'crypto' in watchlist and symbol in watchlist['crypto']:
+            watchlist['crypto'].remove(symbol)
+            removed = True
+            removed_from = 'Crypto'
+        
+        if not removed:
+            return jsonify({'success': False, 'error': f'{symbol} watchlist\'te bulunamadı'}), 404
+        
+        with open(WATCHLIST_FILE, 'w', encoding='utf-8') as f:
+            json.dump(watchlist, f, indent=2, ensure_ascii=False)
+        
+        return jsonify({
+            'success': True,
+            'message': f'{symbol} başarıyla silindi',
+            'symbol': symbol,
+            'removed_from': removed_from
+        })
+    
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 
 def background_update_task():

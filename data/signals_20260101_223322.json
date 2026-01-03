@@ -1,0 +1,362 @@
+[
+  {
+    "symbol": "MSTR",
+    "decision": "HOLD",
+    "combined_score": 58.92,
+    "confidence": 56.5,
+    "sentiment": {
+      "score": 0.671,
+      "label": "positive",
+      "confidence": 28.0,
+      "news_count": 27
+    },
+    "technical": {
+      "score": 85,
+      "decision": "STRONG BUY",
+      "rsi": 22.291907227374878,
+      "trend": "neutral"
+    },
+    "price": {
+      "current": 151.9499969482422,
+      "change_1d": -2.3520362751453527,
+      "change_5d": -3.756022137807702
+    },
+    "timestamp": "2026-01-01T22:33:22.116801"
+  },
+  {
+    "symbol": "META",
+    "decision": "HOLD",
+    "combined_score": 58.0,
+    "confidence": 41.25,
+    "sentiment": {
+      "score": 1.0,
+      "label": "positive",
+      "confidence": 22.5,
+      "news_count": 2
+    },
+    "technical": {
+      "score": 60,
+      "decision": "BUY",
+      "rsi": 56.278618466477624,
+      "trend": "neutral"
+    },
+    "price": {
+      "current": 660.0900268554688,
+      "change_1d": -0.8799437261277077,
+      "change_5d": -0.729385443518249
+    },
+    "timestamp": "2026-01-01T22:33:22.116820"
+  },
+  {
+    "symbol": "AMD",
+    "decision": "HOLD",
+    "combined_score": 50.82,
+    "confidence": 43.15,
+    "sentiment": {
+      "score": 0.641,
+      "label": "positive",
+      "confidence": 26.3,
+      "news_count": 53
+    },
+    "technical": {
+      "score": 60,
+      "decision": "BUY",
+      "rsi": 42.04993297956704,
+      "trend": "neutral"
+    },
+    "price": {
+      "current": 214.16000366210938,
+      "change_1d": -0.5479672591475859,
+      "change_5d": -0.3443416730534943
+    },
+    "timestamp": "2026-01-01T22:33:22.116774"
+  },
+  {
+    "symbol": "NVDA",
+    "decision": "HOLD",
+    "combined_score": 50.46,
+    "confidence": 42.7,
+    "sentiment": {
+      "score": 0.623,
+      "label": "positive",
+      "confidence": 25.4,
+      "news_count": 157
+    },
+    "technical": {
+      "score": 60,
+      "decision": "BUY",
+      "rsi": 53.15838524723775,
+      "trend": "neutral"
+    },
+    "price": {
+      "current": 186.5,
+      "change_1d": -0.5545448029029565,
+      "change_5d": -1.432274519161869
+    },
+    "timestamp": "2026-01-01T22:33:22.116748"
+  },
+  {
+    "symbol": "PLTR",
+    "decision": "HOLD",
+    "combined_score": 45.28,
+    "confidence": 39.05,
+    "sentiment": {
+      "score": 0.514,
+      "label": "positive",
+      "confidence": 28.1,
+      "news_count": 62
+    },
+    "technical": {
+      "score": 50,
+      "decision": "HOLD",
+      "rsi": 40.40060366199312,
+      "trend": "neutral"
+    },
+    "price": {
+      "current": 177.75,
+      "change_1d": -1.7086907766339032,
+      "change_5d": -8.437647180146302
+    },
+    "timestamp": "2026-01-01T22:33:22.116782"
+  },
+  {
+    "symbol": "SLV",
+    "decision": "HOLD",
+    "combined_score": 41.0,
+    "confidence": 35.0,
+    "sentiment": {
+      "score": 0,
+      "label": "neutral",
+      "confidence": 0,
+      "news_count": 0
+    },
+    "technical": {
+      "score": 70,
+      "decision": "STRONG BUY",
+      "rsi": 62.511231462086016,
+      "trend": "neutral"
+    },
+    "price": {
+      "current": 64.41999816894531,
+      "change_1d": -6.610618970823701,
+      "change_5d": -0.6477455161419843
+    },
+    "timestamp": "2026-01-01T22:33:22.116789"
+  },
+  {
+    "symbol": "BE",
+    "decision": "SELL",
+    "combined_score": 39.36,
+    "confidence": 23.75,
+    "sentiment": {
+      "score": 0.368,
+      "label": "positive",
+      "confidence": 7.5,
+      "news_count": 38
+    },
+    "technical": {
+      "score": 40,
+      "decision": "HOLD",
+      "rsi": 38.25064979965989,
+      "trend": "neutral"
+    },
+    "price": {
+      "current": 86.88999938964844,
+      "change_1d": -0.4240233068117272,
+      "change_5d": -4.965548398090003
+    },
+    "timestamp": "2026-01-01T22:33:22.116845"
+  },
+  {
+    "symbol": "BTC-USD",
+    "decision": "SELL",
+    "combined_score": 38.0,
+    "confidence": 30.0,
+    "sentiment": {
+      "score": 0.0,
+      "label": "neutral",
+      "confidence": 0.0,
+      "news_count": 1
+    },
+    "technical": {
+      "score": 60,
+      "decision": "BUY",
+      "rsi": 64.35043163735334,
+      "trend": "neutral"
+    },
+    "price": {
+      "current": 88041.96875,
+      "change_1d": 0.6092421032520834,
+      "change_5d": 0.27312825816849795
+    },
+    "timestamp": "2026-01-01T22:33:22.116795"
+  },
+  {
+    "symbol": "ETH-USD",
+    "decision": "SELL",
+    "combined_score": 38.0,
+    "confidence": 30.0,
+    "sentiment": {
+      "score": 0,
+      "label": "neutral",
+      "confidence": 0,
+      "news_count": 0
+    },
+    "technical": {
+      "score": 60,
+      "decision": "BUY",
+      "rsi": 69.67923926052373,
+      "trend": "neutral"
+    },
+    "price": {
+      "current": 2984.513671875,
+      "change_1d": 0.589007508113637,
+      "change_5d": 1.238650000939967
+    },
+    "timestamp": "2026-01-01T22:33:22.116826"
+  },
+  {
+    "symbol": "SYM",
+    "decision": "SELL",
+    "combined_score": 38.0,
+    "confidence": 30.0,
+    "sentiment": {
+      "score": 0,
+      "label": "neutral",
+      "confidence": 0,
+      "news_count": 0
+    },
+    "technical": {
+      "score": 60,
+      "decision": "BUY",
+      "rsi": 48.47622874053572,
+      "trend": "neutral"
+    },
+    "price": {
+      "current": 59.5,
+      "change_1d": -1.2775849542315476,
+      "change_5d": 1.1216856657045415
+    },
+    "timestamp": "2026-01-01T22:33:22.116839"
+  },
+  {
+    "symbol": "RKLB",
+    "decision": "SELL",
+    "combined_score": 38.0,
+    "confidence": 30.0,
+    "sentiment": {
+      "score": 0,
+      "label": "neutral",
+      "confidence": 0,
+      "news_count": 0
+    },
+    "technical": {
+      "score": 60,
+      "decision": "BUY",
+      "rsi": 62.808709678114724,
+      "trend": "neutral"
+    },
+    "price": {
+      "current": 69.76000213623047,
+      "change_1d": -0.9794107053242906,
+      "change_5d": -9.61388719824573
+    },
+    "timestamp": "2026-01-01T22:33:22.116850"
+  },
+  {
+    "symbol": "AVGO",
+    "decision": "SELL",
+    "combined_score": 36.5,
+    "confidence": 27.5,
+    "sentiment": {
+      "score": 0,
+      "label": "neutral",
+      "confidence": 0,
+      "news_count": 0
+    },
+    "technical": {
+      "score": 55,
+      "decision": "HOLD",
+      "rsi": 23.23361379273858,
+      "trend": "neutral"
+    },
+    "price": {
+      "current": 346.1000061035156,
+      "change_1d": -1.0718879332791587,
+      "change_5d": -0.9217912381739191
+    },
+    "timestamp": "2026-01-01T22:33:22.116859"
+  },
+  {
+    "symbol": "TSLA",
+    "decision": "SELL",
+    "combined_score": 32.0,
+    "confidence": 20.0,
+    "sentiment": {
+      "score": 0,
+      "label": "neutral",
+      "confidence": 0,
+      "news_count": 0
+    },
+    "technical": {
+      "score": 40,
+      "decision": "HOLD",
+      "rsi": 49.359207532931485,
+      "trend": "neutral"
+    },
+    "price": {
+      "current": 449.7200012207031,
+      "change_1d": -1.0364613980130777,
+      "change_5d": -7.3811674186701755
+    },
+    "timestamp": "2026-01-01T22:33:22.116807"
+  },
+  {
+    "symbol": "AAPL",
+    "decision": "SELL",
+    "combined_score": 32.0,
+    "confidence": 20.0,
+    "sentiment": {
+      "score": 0,
+      "label": "neutral",
+      "confidence": 0,
+      "news_count": 0
+    },
+    "technical": {
+      "score": 40,
+      "decision": "HOLD",
+      "rsi": 31.27709291476414,
+      "trend": "neutral"
+    },
+    "price": {
+      "current": 271.8599853515625,
+      "change_1d": -0.44675599849579584,
+      "change_5d": -0.1835805650211797
+    },
+    "timestamp": "2026-01-01T22:33:22.116814"
+  },
+  {
+    "symbol": "ASELS.IS",
+    "decision": "SELL",
+    "combined_score": 30.5,
+    "confidence": 17.5,
+    "sentiment": {
+      "score": 0,
+      "label": "neutral",
+      "confidence": 0,
+      "news_count": 0
+    },
+    "technical": {
+      "score": 35,
+      "decision": "SELL",
+      "rsi": 70.55215054153491,
+      "trend": "neutral"
+    },
+    "price": {
+      "current": 231.6999969482422,
+      "change_1d": 1.17903796866472,
+      "change_5d": 3.1152648398176774
+    },
+    "timestamp": "2026-01-01T22:33:22.116832"
+  }
+]
