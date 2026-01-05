@@ -1,6 +1,6 @@
 """
-METHEFOR FİNANSAL ÖZGÜRLÜK v1.0 - Web Dashboard Backend
-Flask + SocketIO + RESTful API
+METHEFOR FİNANSAL ÖZGÜRLÜK v2.0 - Web Dashboard Backend
+Flask + SocketIO + RESTful API + Alert System
 """
 
 from flask import Flask, render_template, jsonify, request
@@ -8,6 +8,7 @@ from flask_cors import CORS
 from flask_socketio import SocketIO, emit
 import json
 import os
+import sys
 from pathlib import Path
 from datetime import datetime
 import threading
@@ -29,6 +30,10 @@ technical_data = {}
 
 # Watchlist dosya yolu
 WATCHLIST_FILE = BASE_DIR / 'config' / 'watchlist.json'
+
+# Alert sistemi
+alert_engine = None
+notification_manager = None
 
 
 def load_latest_data():
@@ -384,6 +389,185 @@ def remove_from_watchlist():
         return jsonify({'success': False, 'error': str(e)}), 500
 
 
+# ==========================================
+# ALERT SİSTEMİ - API ENDPOINTS
+# ==========================================
+
+@app.route('/api/alerts', methods=['GET'])
+def get_alerts():
+    """Tüm alert'leri getir"""
+    try:
+        if not alert_engine:
+            return jsonify({'success': False, 'error': 'Alert engine yüklenmedi'}), 500
+        
+        alerts = alert_engine.alerts
+        
+        return jsonify({
+            'success': True,
+            'alerts': alerts,
+            'count': len(alerts)
+        })
+    
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/alerts/add', methods=['POST'])
+def add_alert():
+    """Yeni alert ekle"""
+    try:
+        if not alert_engine:
+            return jsonify({'success': False, 'error': 'Alert engine yüklenmedi'}), 500
+        
+        data = request.get_json()
+        
+        # Zorunlu alanları kontrol et
+        if not data.get('symbol'):
+            return jsonify({'success': False, 'error': 'Sembol gerekli'}), 400
+        
+        if not data.get('type'):
+            return jsonify({'success': False, 'error': 'Alert tipi gerekli'}), 400
+        
+        # Alert ekle
+        alert = alert_engine.add_alert(data)
+        
+        if alert:
+            return jsonify({
+                'success': True,
+                'alert': alert,
+                'message': f'{alert["symbol"]} için alert oluşturuldu'
+            })
+        else:
+            return jsonify({'success': False, 'error': 'Alert eklenemedi'}), 500
+    
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/alerts/remove', methods=['POST'])
+def remove_alert():
+    """Alert sil"""
+    try:
+        if not alert_engine:
+            return jsonify({'success': False, 'error': 'Alert engine yüklenmedi'}), 500
+        
+        data = request.get_json()
+        alert_id = data.get('alert_id')
+        
+        if not alert_id:
+            return jsonify({'success': False, 'error': 'Alert ID gerekli'}), 400
+        
+        success = alert_engine.remove_alert(alert_id)
+        
+        if success:
+            return jsonify({
+                'success': True,
+                'message': 'Alert silindi'
+            })
+        else:
+            return jsonify({'success': False, 'error': 'Alert silinemedi'}), 500
+    
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/alerts/toggle', methods=['POST'])
+def toggle_alert():
+    """Alert'i aktif/pasif yap"""
+    try:
+        if not alert_engine:
+            return jsonify({'success': False, 'error': 'Alert engine yüklenmedi'}), 500
+        
+        data = request.get_json()
+        alert_id = data.get('alert_id')
+        enabled = data.get('enabled', True)
+        
+        if not alert_id:
+            return jsonify({'success': False, 'error': 'Alert ID gerekli'}), 400
+        
+        success = alert_engine.toggle_alert(alert_id, enabled)
+        
+        if success:
+            status = 'aktif' if enabled else 'pasif'
+            return jsonify({
+                'success': True,
+                'message': f'Alert {status} edildi'
+            })
+        else:
+            return jsonify({'success': False, 'error': 'Alert güncellenemedi'}), 500
+    
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/alerts/history', methods=['GET'])
+def get_alert_history():
+    """Tetiklenmiş alert geçmişi"""
+    try:
+        if not alert_engine:
+            return jsonify({'success': False, 'error': 'Alert engine yüklenmedi'}), 500
+        
+        limit = request.args.get('limit', 50, type=int)
+        history = alert_engine.get_alert_history(limit)
+        
+        return jsonify({
+            'success': True,
+            'history': history,
+            'count': len(history)
+        })
+    
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/alerts/test', methods=['POST'])
+def test_alert():
+    """Test alert gönder"""
+    try:
+        if not alert_engine or not notification_manager:
+            return jsonify({'success': False, 'error': 'Alert sistemi yüklenmedi'}), 500
+        
+        data = request.get_json()
+        alert_id = data.get('alert_id')
+        
+        if not alert_id:
+            return jsonify({'success': False, 'error': 'Alert ID gerekli'}), 400
+        
+        # Alert'i bul
+        alert = None
+        for a in alert_engine.alerts:
+            if a['id'] == alert_id:
+                alert = a
+                break
+        
+        if not alert:
+            return jsonify({'success': False, 'error': 'Alert bulunamadı'}), 404
+        
+        # Test sinyali oluştur
+        test_signal = {
+            'symbol': alert['symbol'],
+            'decision': 'HOLD',
+            'confidence': 85.0,
+            'combined_score': 75,
+            'price': {'current': 200.0},
+            'technical': {'rsi': 50.0}
+        }
+        
+        # Test bildirimi gönder
+        success = alert_engine.trigger_alert(alert, [test_signal], notification_manager)
+        
+        if success:
+            return jsonify({
+                'success': True,
+                'message': 'Test alert gönderildi'
+            })
+        else:
+            return jsonify({'success': False, 'error': 'Test alert gönderilemedi'}), 500
+    
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
 def background_update_task():
     """Arka planda veri güncelleme (her 30 saniye)"""
     while True:
@@ -395,18 +579,52 @@ def background_update_task():
             'news': latest_news[:20],
             'timestamp': datetime.now().isoformat()
         }, namespace='/')
+        
+        # Alert kontrolü
+        if alert_engine and notification_manager and current_signals:
+            try:
+                triggered = alert_engine.check_alerts(current_signals, notification_manager)
+                if triggered:
+                    print(f"🚨 {len(triggered)} alert tetiklendi")
+            except Exception as e:
+                print(f"Alert kontrol hatası: {e}")
 
 
 def main():
     """Dashboard'u başlat"""
+    global alert_engine, notification_manager
     
     print("\n" + "="*60)
-    print("💰 METHEFOR FİNANSAL ÖZGÜRLÜK - WEB DASHBOARD")
+    print("💰 METHEFOR FİNANSAL ÖZGÜRLÜK - WEB DASHBOARD v2.0")
     print("="*60)
     
     print("\n📊 İlk veri yükleniyor...")
     load_latest_data()
     
+    # Alert sistemi başlat
+    print("\n🔔 Alert sistemi başlatılıyor...")
+    try:
+        # src klasörünü Python path'ine ekle
+        src_path = str(BASE_DIR / 'src')
+        if src_path not in sys.path:
+            sys.path.insert(0, src_path)
+        
+        from alert_engine import AlertEngine
+        from notification_manager import NotificationManager
+        
+        alert_engine = AlertEngine(BASE_DIR)
+        notification_manager = NotificationManager(BASE_DIR, socketio)
+        
+        print(f"✓ {len(alert_engine.alerts)} alert yüklendi")
+        print("✓ Notification manager hazır")
+    except Exception as e:
+        print(f"⚠️ Alert sistemi hatası: {e}")
+        import traceback
+        traceback.print_exc()
+        alert_engine = None
+        notification_manager = None
+    
+    # Background task başlat
     update_thread = threading.Thread(target=background_update_task, daemon=True)
     update_thread.start()
     

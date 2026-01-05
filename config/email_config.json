@@ -1,0 +1,11 @@
+{
+  "smtp_server": "smtp.gmail.com",
+
+  "smtp_port": 465,
+
+  "email": "Methefor@gmail.com",
+
+  "app_password": "mfnb brbk mwrv oakm",
+
+  "recipient": "methefor@gmail.com"
+}

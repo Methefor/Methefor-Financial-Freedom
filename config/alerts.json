@@ -1,0 +1,49 @@
+{
+  "alerts": [
+    {
+      "id": "alert_1767455059442",
+      "symbol": "AMD",
+      "type": "price_above",
+      "condition": {
+        "price": 220
+      },
+      "actions": [
+        "telegram"
+      ],
+      "enabled": true,
+      "created_at": "2026-01-03T18:44:19.442346",
+      "last_triggered": "2026-01-05T22:50:47.600244",
+      "trigger_count": 9
+    },
+    {
+      "id": "alert_1767535906764",
+      "symbol": "AMD",
+      "type": "price_above",
+      "condition": {
+        "price": 220
+      },
+      "actions": [
+        "telegram"
+      ],
+      "enabled": true,
+      "created_at": "2026-01-04T17:11:46.764996",
+      "last_triggered": "2026-01-05T22:50:48.327531",
+      "trigger_count": 9
+    },
+    {
+      "id": "alert_1767535911138",
+      "symbol": "AMD",
+      "type": "price_above",
+      "condition": {
+        "price": 220
+      },
+      "actions": [
+        "telegram"
+      ],
+      "enabled": true,
+      "created_at": "2026-01-04T17:11:51.138572",
+      "last_triggered": "2026-01-05T22:50:49.024539",
+      "trigger_count": 9
+    }
+  ]
+}
