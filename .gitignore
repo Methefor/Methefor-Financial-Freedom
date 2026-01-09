@@ -1,6 +1,18 @@
 config/api_keys.json
 api_keys.json
-__pycache__/
+__pycache__
 *.pyc
+.env
+.DS_Store
+
+# User Data
+config/api_keys.json
+methefor.db
 logs/
+*.log
+debug_*.txt
+
+# IDE
+.vscode/
+.gemini/
 *.log

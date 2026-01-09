@@ -226,25 +226,10 @@ class TechnicalAnalyzer:
             logger.error(f"Bollinger Bands hatası: {e}")
             return {}
     
-    def analyze_symbol(self, symbol: str, period: str = "3mo") -> Dict:
+    def analyze_dataframe(self, symbol: str, data: pd.DataFrame) -> Dict:
         """
-        Bir sembol için tüm teknik analizi yap
-        
-        Args:
-            symbol: Hisse/kripto sembolü
-            period: Analiz periyodu
-            
-        Returns:
-            Comprehensive technical analysis
+        Verilen DataFrame üzerinde teknik analiz yap (Backtest için uygun)
         """
-        logger.info(f"[TECH] {symbol} teknik analiz başlatılıyor...")
-        
-        # Veri çek
-        data = self.get_stock_data(symbol, period=period)
-        
-        if data.empty:
-            return {'error': 'No data available'}
-        
         try:
             # RSI
             rsi = self.calculate_rsi(data)
@@ -286,7 +271,7 @@ class TechnicalAnalyzer:
             
             return {
                 'symbol': symbol,
-                'timestamp': datetime.now().isoformat(),
+                'timestamp': data.index[-1].isoformat() if not data.empty else datetime.now().isoformat(),
                 'price': {
                     'current': current_price,
                     'change_1d': price_change_1d,
@@ -317,6 +302,32 @@ class TechnicalAnalyzer:
         except Exception as e:
             logger.error(f"{symbol} analiz hatası: {e}")
             return {'error': str(e)}
+
+    def analyze_symbol(self, symbol: str, period: str = "3mo") -> Dict:
+        """
+        Bir sembol için canlı teknik analiz yap
+        """
+        logger.info(f"[TECH] {symbol} teknik analiz başlatılıyor...")
+        
+        # 1. Veri Çekme
+        try:
+            # yfinance bazen sembol bulunsa bile 'no data' hatası verebiliyor
+            # veya internal index error fırlatabiliyor.
+            ticker = yf.Ticker(symbol)
+            
+            # Geçmiş verisi (1 yıl)
+            hist = ticker.history(period="1y")
+            
+            if hist.empty:
+                logger.warning(f"No historical data for {symbol}")
+                return {'error': 'No data'}
+            
+        except Exception as e:
+            logger.warning(f"yfinance error for {symbol}: {str(e)}")
+            return {'error': f'Data fetch error: {str(e)}'}
+            
+        # 2. Analiz et
+        return self.analyze_dataframe(symbol, hist)
     
     def _generate_technical_signals(self, rsi: float, macd: float, signal: float, 
                                       histogram: float, trend: str, volume: Dict, bb: Dict) -> Dict:

@@ -4,6 +4,8 @@ Real-time market news ve company news
 """
 
 import requests
+import aiohttp
+import asyncio
 import json
 import time
 from datetime import datetime, timedelta
@@ -42,6 +44,101 @@ class FinnhubNewsAPI:
             logger.info("📝 API key almak için: https://finnhub.io/register")
         else:
             logger.info("[OK] Finnhub API başlatıldı")
+
+    async def _fetch_async(self, session, url, params):
+        """Async HTTP request helper"""
+        try:
+            async with session.get(url, params=params, timeout=10) as response:
+                response.raise_for_status()
+                return await response.json()
+        except Exception as e:
+            logger.error(f"Async request error ({url}): {e}")
+            return None
+
+    async def get_market_news_async(self, session: aiohttp.ClientSession, category: str = "general") -> List[Dict]:
+        """
+        Asenkron genel piyasa haberlerini getir
+        """
+        if not self.api_key or self.api_key == "YOUR_FINNHUB_API_KEY_HERE":
+            return self._get_mock_news()
+        
+        url = f"{self.base_url}/news"
+        params = {
+            'category': category,
+            'token': self.api_key
+        }
+        
+        data = await self._fetch_async(session, url, params)
+        if not data:
+            return []
+            
+        formatted_news = []
+        for item in data:
+            formatted_news.append({
+                'source': item.get('source', 'Finnhub'),
+                'title': item.get('headline', ''),
+                'summary': item.get('summary', ''),
+                'link': item.get('url', ''),
+                'published': datetime.fromtimestamp(item.get('datetime', 0)).isoformat(),
+                'category': item.get('category', category),
+                'related_symbols': item.get('related', '').split(',') if item.get('related') else [],
+                'timestamp': datetime.now().isoformat()
+            })
+        return formatted_news
+
+    async def get_company_news_async(self, session: aiohttp.ClientSession, symbol: str, days_back: int = 7) -> List[Dict]:
+        """
+        Asenkron şirket haberlerini getir
+        """
+        if not self.api_key:
+            return []
+        
+        to_date = datetime.now()
+        from_date = to_date - timedelta(days=days_back)
+        
+        url = f"{self.base_url}/company-news"
+        params = {
+            'symbol': symbol.upper(),
+            'from': from_date.strftime('%Y-%m-%d'),
+            'to': to_date.strftime('%Y-%m-%d'),
+            'token': self.api_key
+        }
+        
+        data = await self._fetch_async(session, url, params)
+        if not data:
+            return []
+            
+        formatted_news = []
+        for item in data:
+            formatted_news.append({
+                'source': item.get('source', 'Finnhub'),
+                'title': item.get('headline', ''),
+                'summary': item.get('summary', ''),
+                'link': item.get('url', ''),
+                'published': datetime.fromtimestamp(item.get('datetime', 0)).isoformat(),
+                'category': 'company',
+                'matched_symbol': symbol.upper(),
+                'timestamp': datetime.now().isoformat()
+            })
+        return formatted_news
+    
+    async def get_watchlist_news_async(self, symbols: List[str], days_back: int = 3) -> List[Dict]:
+        """
+        Tüm watchlist için parallel haber çekme
+        """
+        async with aiohttp.ClientSession() as session:
+            tasks = [self.get_company_news_async(session, symbol, days_back) for symbol in symbols]
+            results = await asyncio.gather(*tasks)
+            
+            all_news = []
+            for news_list in results:
+                all_news.extend(news_list)
+            
+            # Sort by date
+            all_news.sort(key=lambda x: x['published'], reverse=True)
+            return all_news
+
+    # ... (Keep existing sync methods for compatibility if needed, or we can rely on async from now on)
     
     def get_market_news(self, category: str = "general", min_id: int = 0) -> List[Dict]:
         """
@@ -253,6 +350,18 @@ def main():
     # API'yi başlat
     api = FinnhubNewsAPI()
     
+    # Async testi
+    print("\n[ASYNC] Async haber toplama testi...")
+    async def run_async_test():
+        async with aiohttp.ClientSession() as session:
+            news = await api.get_market_news_async(session)
+            print(f"Async Market News: {len(news)} items")
+            
+            company_news = await api.get_company_news_async(session, 'AAPL')
+            print(f"Async AAPL News: {len(company_news)} items")
+    
+    asyncio.run(run_async_test())
+
     # 1. Genel piyasa haberleri
     print("[NEWS] Genel Piyasa Haberleri:\n")
     market_news = api.get_market_news(category='general')

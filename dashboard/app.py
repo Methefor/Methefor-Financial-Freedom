@@ -1,6 +1,6 @@
 """
-METHEFOR FİNANSAL ÖZGÜRLÜK v2.0 - Web Dashboard Backend
-Flask + SocketIO + RESTful API + Alert System
+METHEFOR FİNANSAL ÖZGÜRLÜK v2.1 - Web Dashboard Backend
+Flask + SocketIO + RESTful API + SQLite
 """
 
 from flask import Flask, render_template, jsonify, request
@@ -16,6 +16,10 @@ import time
 
 # Ana dizin
 BASE_DIR = Path(__file__).parent.parent
+sys.path.insert(0, str(BASE_DIR))
+
+# Database Imports
+from src.database import init_db, get_session, NewsItem, TechnicalResult, Signal
 
 app = Flask(__name__, 
             template_folder='templates',
@@ -23,7 +27,10 @@ app = Flask(__name__,
 CORS(app)
 socketio = SocketIO(app, cors_allowed_origins="*")
 
-# Global state
+# Database Engine
+db_engine = init_db(str(BASE_DIR / 'methefor.db'))
+
+# Global state (Cache)
 current_signals = []
 latest_news = []
 technical_data = {}
@@ -31,38 +38,94 @@ technical_data = {}
 # Watchlist dosya yolu
 WATCHLIST_FILE = BASE_DIR / 'config' / 'watchlist.json'
 
-# Alert sistemi
-alert_engine = None
-notification_manager = None
-
 
 def load_latest_data():
-    """En son veriyi yükle"""
+    """En son veriyi veritabanından yükle"""
     global current_signals, latest_news, technical_data
     
-    data_dir = BASE_DIR / 'data'
-    
+    session = get_session(db_engine)
     try:
-        signal_files = sorted(data_dir.glob('signals_*.json'), reverse=True)
-        news_files = sorted(data_dir.glob('news_*.json'), reverse=True)
-        tech_files = sorted(data_dir.glob('technical_*.json'), reverse=True)
+        # 1. Signals
+        # Get latest signals unique by symbol (or just latest batch)
+        # For simplicity, getting all signals from today or latest 50
+        db_signals = session.query(Signal).order_by(Signal.timestamp.desc()).limit(100).all()
         
-        if signal_files:
-            with open(signal_files[0], 'r', encoding='utf-8') as f:
-                current_signals = json.load(f)
+        # Transform for frontend
+        temp_signals = {} # Use dict to get unique latest per symbol
         
-        if news_files:
-            with open(news_files[0], 'r', encoding='utf-8') as f:
-                latest_news = json.load(f)
+        for s in db_signals:
+            if s.symbol not in temp_signals:
+                reasons = json.loads(s.reasons) if s.reasons else []
+                
+                # Reconstruct expected format
+                formatted_sig = {
+                    'symbol': s.symbol,
+                    'decision': s.decision,
+                    'combined_score': s.combined_score,
+                    'confidence': s.confidence,
+                    'sentiment': {
+                        'score': s.news_sentiment_score,
+                        'label': 'positive' if s.news_sentiment_score > 0.1 else 'negative' if s.news_sentiment_score < -0.1 else 'neutral',
+                        'news_count': 0 # DB'de saklamadık, ekleyebiliriz veya 0 geçebiliriz
+                    },
+                    'technical': {
+                        'score': s.technical_score,
+                        'decision': 'N/A', # Detay lazım olursa technical_results'dan çekilebilir
+                        'trend': 'N/A'
+                    },
+                    'price': {'current': 0}, # Fiyat bilgisi technical'da
+                    'reasons': reasons,
+                    'timestamp': s.timestamp.isoformat()
+                }
+                temp_signals[s.symbol] = formatted_sig
         
-        if tech_files:
-            with open(tech_files[0], 'r', encoding='utf-8') as f:
-                technical_data = json.load(f)
+        current_signals = list(temp_signals.values())
+        current_signals.sort(key=lambda x: x['combined_score'], reverse=True)
+
+        # 2. News
+        db_news = session.query(NewsItem).order_by(NewsItem.published_date.desc()).limit(50).all()
+        latest_news = []
+        for n in db_news:
+            latest_news.append({
+                'id': n.id,
+                'source': n.source,
+                'title': n.title,
+                'summary': n.summary,
+                'link': n.link,
+                'published': n.published_date.isoformat() if n.published_date else "",
+                'category': n.category,
+                'sentiment': {
+                    'score': n.sentiment_score,
+                    'label': n.sentiment_label or ('positive' if n.sentiment_score > 0 else 'negative' if n.sentiment_score < 0 else 'neutral')
+                },
+                'matched_symbol': json.loads(n.related_symbols)[0] if n.related_symbols and len(json.loads(n.related_symbols)) > 0 else None
+            })
+
+        # 3. Technical
+        # Get latest technical per symbol
+        db_tech = session.query(TechnicalResult).order_by(TechnicalResult.timestamp.desc()).limit(100).all()
         
-        print(f"✓ Data yüklendi: {len(current_signals)} sinyal, {len(latest_news)} haber")
+        technical_data = {}
+        for t in db_tech:
+            if t.symbol not in technical_data:
+                details = json.loads(t.details) if t.details else {}
+                technical_data[t.symbol] = details
+                
+                # Update signal with better technical info if available
+                matching_signal = next((s for s in current_signals if s['symbol'] == t.symbol), None)
+                if matching_signal:
+                    matching_signal['technical']['rsi'] = t.rsi
+                    matching_signal['technical']['trend'] = t.trend
+                    matching_signal['price'] = {'current': t.price}
+                    if 'technical_signals' in details:
+                        matching_signal['technical']['decision'] = details['technical_signals'].get('decision', 'N/A')
+
+        print(f"✓ DB Data yüklendi: {len(current_signals)} sinyal, {len(latest_news)} haber")
         
     except Exception as e:
-        print(f"Data yükleme hatası: {e}")
+        print(f"DB Data yükleme hatası: {e}")
+    finally:
+        session.close()
 
 
 # Routes
@@ -99,7 +162,6 @@ def get_symbol_signal(symbol):
 def get_news():
     """Son haberleri döndür"""
     limit = request.args.get('limit', 20, type=int)
-    
     return jsonify({
         'success': True,
         'count': len(latest_news),
@@ -115,7 +177,7 @@ def get_symbol_news(symbol):
     
     symbol_news = [
         n for n in latest_news 
-        if n.get('matched_symbol', '').upper() == symbol_upper
+        if n.get('matched_symbol') == symbol_upper
     ]
     
     return jsonify({
@@ -208,7 +270,7 @@ def handle_update_request():
 
 
 # ==========================================
-# WATCHLIST API ENDPOINTS
+# WATCHLIST API ENDPOINTS (Existing Logic)
 # ==========================================
 
 @app.route('/api/watchlist', methods=['GET'])
@@ -280,9 +342,13 @@ def add_to_watchlist():
         if not symbol:
             return jsonify({'success': False, 'error': 'Sembol boş olamaz'}), 400
         
-        with open(WATCHLIST_FILE, 'r', encoding='utf-8') as f:
-            watchlist = json.load(f)
-        
+        # Read from file
+        if os.path.exists(WATCHLIST_FILE):
+             with open(WATCHLIST_FILE, 'r', encoding='utf-8') as f:
+                watchlist = json.load(f)
+        else:
+            watchlist = {'stocks': {'custom': []}}
+
         all_current = []
         for cat_symbols in watchlist.get('stocks', {}).values():
             all_current.extend(cat_symbols)
@@ -389,185 +455,6 @@ def remove_from_watchlist():
         return jsonify({'success': False, 'error': str(e)}), 500
 
 
-# ==========================================
-# ALERT SİSTEMİ - API ENDPOINTS
-# ==========================================
-
-@app.route('/api/alerts', methods=['GET'])
-def get_alerts():
-    """Tüm alert'leri getir"""
-    try:
-        if not alert_engine:
-            return jsonify({'success': False, 'error': 'Alert engine yüklenmedi'}), 500
-        
-        alerts = alert_engine.alerts
-        
-        return jsonify({
-            'success': True,
-            'alerts': alerts,
-            'count': len(alerts)
-        })
-    
-    except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 500
-
-
-@app.route('/api/alerts/add', methods=['POST'])
-def add_alert():
-    """Yeni alert ekle"""
-    try:
-        if not alert_engine:
-            return jsonify({'success': False, 'error': 'Alert engine yüklenmedi'}), 500
-        
-        data = request.get_json()
-        
-        # Zorunlu alanları kontrol et
-        if not data.get('symbol'):
-            return jsonify({'success': False, 'error': 'Sembol gerekli'}), 400
-        
-        if not data.get('type'):
-            return jsonify({'success': False, 'error': 'Alert tipi gerekli'}), 400
-        
-        # Alert ekle
-        alert = alert_engine.add_alert(data)
-        
-        if alert:
-            return jsonify({
-                'success': True,
-                'alert': alert,
-                'message': f'{alert["symbol"]} için alert oluşturuldu'
-            })
-        else:
-            return jsonify({'success': False, 'error': 'Alert eklenemedi'}), 500
-    
-    except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 500
-
-
-@app.route('/api/alerts/remove', methods=['POST'])
-def remove_alert():
-    """Alert sil"""
-    try:
-        if not alert_engine:
-            return jsonify({'success': False, 'error': 'Alert engine yüklenmedi'}), 500
-        
-        data = request.get_json()
-        alert_id = data.get('alert_id')
-        
-        if not alert_id:
-            return jsonify({'success': False, 'error': 'Alert ID gerekli'}), 400
-        
-        success = alert_engine.remove_alert(alert_id)
-        
-        if success:
-            return jsonify({
-                'success': True,
-                'message': 'Alert silindi'
-            })
-        else:
-            return jsonify({'success': False, 'error': 'Alert silinemedi'}), 500
-    
-    except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 500
-
-
-@app.route('/api/alerts/toggle', methods=['POST'])
-def toggle_alert():
-    """Alert'i aktif/pasif yap"""
-    try:
-        if not alert_engine:
-            return jsonify({'success': False, 'error': 'Alert engine yüklenmedi'}), 500
-        
-        data = request.get_json()
-        alert_id = data.get('alert_id')
-        enabled = data.get('enabled', True)
-        
-        if not alert_id:
-            return jsonify({'success': False, 'error': 'Alert ID gerekli'}), 400
-        
-        success = alert_engine.toggle_alert(alert_id, enabled)
-        
-        if success:
-            status = 'aktif' if enabled else 'pasif'
-            return jsonify({
-                'success': True,
-                'message': f'Alert {status} edildi'
-            })
-        else:
-            return jsonify({'success': False, 'error': 'Alert güncellenemedi'}), 500
-    
-    except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 500
-
-
-@app.route('/api/alerts/history', methods=['GET'])
-def get_alert_history():
-    """Tetiklenmiş alert geçmişi"""
-    try:
-        if not alert_engine:
-            return jsonify({'success': False, 'error': 'Alert engine yüklenmedi'}), 500
-        
-        limit = request.args.get('limit', 50, type=int)
-        history = alert_engine.get_alert_history(limit)
-        
-        return jsonify({
-            'success': True,
-            'history': history,
-            'count': len(history)
-        })
-    
-    except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 500
-
-
-@app.route('/api/alerts/test', methods=['POST'])
-def test_alert():
-    """Test alert gönder"""
-    try:
-        if not alert_engine or not notification_manager:
-            return jsonify({'success': False, 'error': 'Alert sistemi yüklenmedi'}), 500
-        
-        data = request.get_json()
-        alert_id = data.get('alert_id')
-        
-        if not alert_id:
-            return jsonify({'success': False, 'error': 'Alert ID gerekli'}), 400
-        
-        # Alert'i bul
-        alert = None
-        for a in alert_engine.alerts:
-            if a['id'] == alert_id:
-                alert = a
-                break
-        
-        if not alert:
-            return jsonify({'success': False, 'error': 'Alert bulunamadı'}), 404
-        
-        # Test sinyali oluştur
-        test_signal = {
-            'symbol': alert['symbol'],
-            'decision': 'HOLD',
-            'confidence': 85.0,
-            'combined_score': 75,
-            'price': {'current': 200.0},
-            'technical': {'rsi': 50.0}
-        }
-        
-        # Test bildirimi gönder
-        success = alert_engine.trigger_alert(alert, [test_signal], notification_manager)
-        
-        if success:
-            return jsonify({
-                'success': True,
-                'message': 'Test alert gönderildi'
-            })
-        else:
-            return jsonify({'success': False, 'error': 'Test alert gönderilemedi'}), 500
-    
-    except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 500
-
-
 def background_update_task():
     """Arka planda veri güncelleme (her 30 saniye)"""
     while True:
@@ -579,52 +466,18 @@ def background_update_task():
             'news': latest_news[:20],
             'timestamp': datetime.now().isoformat()
         }, namespace='/')
-        
-        # Alert kontrolü
-        if alert_engine and notification_manager and current_signals:
-            try:
-                triggered = alert_engine.check_alerts(current_signals, notification_manager)
-                if triggered:
-                    print(f"🚨 {len(triggered)} alert tetiklendi")
-            except Exception as e:
-                print(f"Alert kontrol hatası: {e}")
 
 
 def main():
     """Dashboard'u başlat"""
-    global alert_engine, notification_manager
     
     print("\n" + "="*60)
-    print("💰 METHEFOR FİNANSAL ÖZGÜRLÜK - WEB DASHBOARD v2.0")
+    print("💰 METHEFOR FİNANSAL ÖZGÜRLÜK - WEB DASHBOARD (DB CONNECTED)")
     print("="*60)
     
     print("\n📊 İlk veri yükleniyor...")
     load_latest_data()
     
-    # Alert sistemi başlat
-    print("\n🔔 Alert sistemi başlatılıyor...")
-    try:
-        # src klasörünü Python path'ine ekle
-        src_path = str(BASE_DIR / 'src')
-        if src_path not in sys.path:
-            sys.path.insert(0, src_path)
-        
-        from alert_engine import AlertEngine
-        from notification_manager import NotificationManager
-        
-        alert_engine = AlertEngine(BASE_DIR)
-        notification_manager = NotificationManager(BASE_DIR, socketio)
-        
-        print(f"✓ {len(alert_engine.alerts)} alert yüklendi")
-        print("✓ Notification manager hazır")
-    except Exception as e:
-        print(f"⚠️ Alert sistemi hatası: {e}")
-        import traceback
-        traceback.print_exc()
-        alert_engine = None
-        notification_manager = None
-    
-    # Background task başlat
     update_thread = threading.Thread(target=background_update_task, daemon=True)
     update_thread.start()
     
