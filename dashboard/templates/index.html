@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>METHEFOR Finansal Özgürlük v2.0</title>
+    <title>METHEFOR Finansal Özgürlük v3.0 (AI Powered)</title>
     <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
@@ -299,6 +299,76 @@
         background: rgba(148, 163, 184, 0.3);
         color: #94a3b8;
       }
+
+      /* CHAT FUNCTIONALITY */
+      /*
+       * The following JavaScript functions are intended for a <script> block in an HTML file
+       * or a separate .js file. They are commented out here to maintain CSS file validity.
+       * Please place them in the appropriate JavaScript context.
+       */
+      /*
+      function toggleChat() {
+          const panel = document.getElementById('chat-panel');
+          const isVisible = panel.style.display === 'flex';
+          panel.style.display = isVisible ? 'none' : 'flex';
+      }
+
+      function handleChatKey(e) {
+          if (e.key === 'Enter') {
+              sendMessage();
+          }
+      }
+
+      async function sendMessage() {
+          const input = document.getElementById('chat-input');
+          const message = input.value.trim();
+          if (!message) return;
+
+          // Add user message
+          addMessage(message, 'user');
+          input.value = '';
+
+          // Show loading (optional or fake generic)
+          const loadingId = addMessage('...', 'ai');
+
+          try {
+              const res = await fetch('/api/chat', {
+                  method: 'POST',
+                  headers: {'Content-Type': 'application/json'},
+                  body: JSON.stringify({message: message})
+              });
+              
+              const data = await res.json();
+              
+              // Remove loading and add response
+              removeMessage(loadingId);
+              if(data.success) {
+                  addMessage(data.response, 'ai');
+              } else {
+                  addMessage("Üzgünüm, bir hata oluştu.", 'ai');
+              }
+          } catch (error) {
+              removeMessage(loadingId);
+              addMessage("Bağlantı hatası!", 'ai');
+          }
+      }
+
+      function addMessage(text, type) {
+          const container = document.getElementById('chat-messages');
+          const div = document.createElement('div');
+          div.className = `message ${type}`;
+          div.id = 'msg-' + Date.now();
+          div.textContent = text;
+          container.appendChild(div);
+          container.scrollTop = container.scrollHeight;
+          return div.id;
+      }
+
+      function removeMessage(id) {
+          const el = document.getElementById(id);
+          if(el) el.remove();
+      }
+      */
 
       /* MODAL STYLES */
       .modal {
@@ -899,7 +969,107 @@
         right: 30px;
         z-index: 1000;
       }
-
+      /* Chatbot Widget Styles */
+      .chat-widget {
+          position: fixed;
+          bottom: 20px;
+          right: 20px;
+          z-index: 1000;
+      }
+      .chat-button {
+          width: 60px;
+          height: 60px;
+          border-radius: 50%;
+          background: linear-gradient(135deg, var(--gold), #d4af37);
+          border: none;
+          box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+          cursor: pointer;
+          font-size: 24px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: transform 0.3s;
+      }
+      .chat-button:hover {
+          transform: scale(1.1);
+      }
+      .chat-panel {
+          position: absolute;
+          bottom: 80px;
+          right: 0;
+          width: 350px;
+          height: 450px;
+          background: var(--card-bg);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: 15px;
+          display: flex;
+          flex-direction: column;
+          box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+          display: none; /* Gizli başlar */
+          overflow: hidden;
+      }
+      .chat-header {
+          padding: 15px;
+          background: rgba(255, 255, 255, 0.05);
+          border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+      }
+      .chat-messages {
+          flex: 1;
+          padding: 15px;
+          overflow-y: auto;
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+      }
+      .message {
+          max-width: 80%;
+          padding: 10px 15px;
+          border-radius: 10px;
+          font-size: 0.9em;
+          line-height: 1.4;
+      }
+      .message.user {
+          align-self: flex-end;
+          background: rgba(255, 215, 0, 0.2);
+          color: var(--gold);
+          border-bottom-right-radius: 2px;
+      }
+      .message.ai {
+          align-self: flex-start;
+          background: rgba(255, 255, 255, 0.1);
+          color: white;
+          border-bottom-left-radius: 2px;
+      }
+      .chat-input-area {
+          padding: 15px;
+          border-top: 1px solid rgba(255, 255, 255, 0.1);
+          display: flex;
+          gap: 10px;
+      }
+      .chat-input {
+          flex: 1;
+          background: rgba(0, 0, 0, 0.3);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: 20px;
+          padding: 10px 15px;
+          color: white;
+          outline: none;
+      }
+      .chat-send-btn {
+          background: var(--gold);
+          border: none;
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          cursor: pointer;
+          color: black;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+      }
       .theme-btn {
         width: 60px;
         height: 60px;
@@ -983,6 +1153,43 @@
       </div>
 
       <div class="main-grid">
+        <!-- PORTFOLIO PANEL -->
+        <div class="panel" style="margin-bottom: 20px;">
+          <div class="panel-header">
+            <div class="panel-title">💼 Sanal Portföy (Paper Trading)</div>
+            <div style="font-size: 1.1em; color: var(--success); font-weight: bold;">
+                Toplam Varlık: <span id="total-equity">$0.00</span>
+            </div>
+          </div>
+          <div style="display: flex; gap: 20px; align-items: center; margin-bottom: 15px;">
+              <div class="stat-card" style="padding: 15px; min-width: 150px;">
+                  <div class="stat-label">Nakit (USD)</div>
+                  <div class="stat-value" id="portfolio-cash" style="font-size: 1.5em;">$0.00</div>
+              </div>
+              <div class="stat-card" style="padding: 15px; min-width: 150px;">
+                  <div class="stat-label">Hisse Değeri</div>
+                  <div class="stat-value" id="portfolio-stock-value" style="font-size: 1.5em;">$0.00</div>
+              </div>
+          </div>
+          <div id="portfolio-table-container">
+              <table style="width: 100%; border-collapse: collapse; color: white;">
+                  <thead>
+                      <tr style="border-bottom: 2px solid var(--gold); text-align: left; color: var(--gold);">
+                          <th style="padding: 10px;">Sembol</th>
+                          <th style="padding: 10px;">Adet</th>
+                          <th style="padding: 10px;">Ort. Maliyet</th>
+                          <th style="padding: 10px;">Güncel Fiyat</th>
+                          <th style="padding: 10px;">Değer</th>
+                          <th style="padding: 10px;">Kâr/Zarar</th>
+                      </tr>
+                  </thead>
+                  <tbody id="portfolio-list">
+                      <!-- JS ile doldurulacak -->
+                  </tbody>
+              </table>
+          </div>
+        </div>
+
         <div class="panel">
           <div class="panel-header">
             <div class="panel-title">📊 En İyi Sinyaller</div>
@@ -1127,6 +1334,24 @@
       </div>
     </div>
 
+    <!-- CHAT WIDGET -->
+    <div class="chat-widget">
+        <div class="chat-panel" id="chat-panel">
+            <div class="chat-header">
+                <span style="font-weight: bold; color: var(--gold);">🤖 Methefor AI</span>
+                <span style="font-size: 1.2em; cursor: pointer;" onclick="toggleChat()">×</span>
+            </div>
+            <div class="chat-messages" id="chat-messages">
+                <div class="message ai">Merhaba! Ben Methefor Asistanı. Size nasıl yardımcı olabilirim?</div>
+            </div>
+            <div class="chat-input-area">
+                <input type="text" class="chat-input" id="chat-input" placeholder="Bir şeyler sor..." onkeypress="handleChatKey(event)">
+                <button class="chat-send-btn" onclick="sendMessage()">➤</button>
+            </div>
+        </div>
+        <button class="chat-button" onclick="toggleChat()">💬</button>
+    </div>
+
     <!-- THEME TOGGLE -->
     <div class="theme-toggle">
       <button class="theme-btn" onclick="toggleTheme()" id="theme-btn">
@@ -1255,9 +1480,10 @@
           showLoading('news-container');
           toast.info('Veriler güncelleniyor...', 2000);
 
-          const [summaryRes, newsRes] = await Promise.all([
+          const [summaryRes, newsRes, portfolioRes] = await Promise.all([
             fetch('/api/summary'),
             fetch('/api/news?limit=10'),
+            fetch('/api/portfolio')
           ]);
 
           if (!summaryRes.ok || !newsRes.ok) {
@@ -1266,8 +1492,12 @@
 
           const summaryData = await summaryRes.json();
           const newsData = await newsRes.json();
+          const portfolioData = await portfolioRes.json();
 
           const summary = summaryData.summary || summaryData;
+          if(portfolioData.success) {
+              summary.portfolio = portfolioData.portfolio;
+          }
           const news = newsData.news || newsData;
 
           updateStats(summary);
@@ -1301,6 +1531,44 @@
         document.getElementById('buy-signals').textContent = buyCount;
         document.getElementById('sell-signals').textContent = sellCount;
         document.getElementById('news-count').textContent = newsCount;
+        
+        // Portföy Güncelleme
+        if(summary.portfolio) {
+            updatePortfolio(summary.portfolio);
+        }
+      }
+
+      function updatePortfolio(portfolio) {
+          const totalEquity = portfolio.total_equity ?? 0;
+          const cash = portfolio.cash ?? 0;
+          const stockValue = totalEquity - cash;
+
+          document.getElementById('total-equity').textContent = '$' + totalEquity.toFixed(2);
+          document.getElementById('portfolio-cash').textContent = '$' + cash.toFixed(2);
+          document.getElementById('portfolio-stock-value').textContent = '$' + stockValue.toFixed(2);
+
+          const tbody = document.getElementById('portfolio-list');
+          if(!portfolio.holdings || portfolio.holdings.length === 0) {
+              tbody.innerHTML = '<tr><td colspan="6" style="padding:20px; text-align:center; color:#94a3b8;">Henüz açık pozisyon yok.</td></tr>';
+              return;
+          }
+
+          tbody.innerHTML = portfolio.holdings.map(item => {
+              const pnlClass = item.pnl >= 0 ? 'success' : 'danger';
+              const pnlSign = item.pnl >= 0 ? '+' : '';
+              return `
+                  <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+                      <td style="padding: 10px; font-weight:bold;">${item.symbol}</td>
+                      <td style="padding: 10px;">${item.quantity.toFixed(4)}</td>
+                      <td style="padding: 10px;">$${item.avg_price.toFixed(2)}</td>
+                      <td style="padding: 10px;">$${item.price.toFixed(2)}</td>
+                      <td style="padding: 10px;">$${item.value.toFixed(2)}</td>
+                      <td style="padding: 10px; color: var(--${pnlClass}); font-weight:bold;">
+                          ${pnlSign}${item.pnl.toFixed(2)}%
+                      </td>
+                  </tr>
+              `;
+          }).join('');
       }
 
       function updateSignals(signals) {
@@ -1388,12 +1656,85 @@
                                     ? item.symbols.join(', ')
                                     : 'Genel'
                                 }
-                            </span>
-                        </div>
+        </div>
                     </div>
                 `;
           })
           .join('');
+      }
+
+      /* SIGNAL MODAL LOGIC */
+      function openModal(symbol) {
+          const signal = currentData.signals.find(s => s.symbol === symbol);
+          if (!signal) return;
+
+          document.getElementById('modal-symbol').textContent = signal.symbol;
+          document.getElementById('modal-score').textContent = signal.combined_score;
+          
+          // ... (Modal logic continues) ...
+      }
+      
+      /* CHAT FUNCTIONALITY */
+      function toggleChat() {
+          const panel = document.getElementById('chat-panel');
+          const isVisible = panel.style.display === 'flex';
+          panel.style.display = isVisible ? 'none' : 'flex';
+      }
+
+      function handleChatKey(e) {
+          if (e.key === 'Enter') {
+              sendMessage();
+          }
+      }
+
+      async function sendMessage() {
+          const input = document.getElementById('chat-input');
+          const message = input.value.trim();
+          if (!message) return;
+
+          // Add user message
+          addMessage(message, 'user');
+          input.value = '';
+
+          // Show loading
+          const loadingId = addMessage('...', 'ai');
+
+          try {
+              const res = await fetch('/api/chat', {
+                  method: 'POST',
+                  headers: {'Content-Type': 'application/json'},
+                  body: JSON.stringify({message: message})
+              });
+              
+              const data = await res.json();
+              
+              // Remove loading and add response
+              removeMessage(loadingId);
+              if(data.success) {
+                  addMessage(data.response, 'ai');
+              } else {
+                  addMessage("Üzgünüm, bir hata oluştu.", 'ai');
+              }
+          } catch (error) {
+              removeMessage(loadingId);
+              addMessage("Bağlantı hatası!", 'ai');
+          }
+      }
+
+      function addMessage(text, type) {
+          const container = document.getElementById('chat-messages');
+          const div = document.createElement('div');
+          div.className = `message ${type}`;
+          div.id = 'msg-' + Date.now();
+          div.textContent = text;
+          container.appendChild(div);
+          container.scrollTop = container.scrollHeight;
+          return div.id;
+      }
+
+      function removeMessage(id) {
+          const el = document.getElementById(id);
+          if(el) el.remove();
       }
 
       function showSignalDetails(symbol) {
@@ -1420,6 +1761,21 @@
                         <span>Güven: ${signal.confidence.toFixed(1)}%</span>
                     </div>
                 </div>
+
+                ${signal.ai_explanation ? `
+                <div class="recommendation-card" style="border-left-color: #8b5cf6;">
+                    <div class="recommendation-header" style="color: #8b5cf6;">
+                        <div class="recommendation-icon">🧠</div>
+                        <div>Yapay Zeka (AI) Analizi</div>
+                    </div>
+                    <div class="recommendation-body">
+                        ${signal.ai_explanation.replace(/\n/g, '<br>')}
+                    </div>
+                    <div class="recommendation-footer">
+                        Google Gemini tarafından analiz edildi • ${new Date(signal.timestamp).toLocaleString()}
+                    </div>
+                </div>
+                ` : ''}
                 
                 <div class="modal-section-full">
                     <div class="modal-section-title">📈 TradingView Canlı Grafiği</div>
@@ -1530,6 +1886,32 @@
                                     }
                                 </span>
                             </div>
+                            
+                           ${
+                             signal.technical?.patterns?.found
+                               ? `
+                            <div class="info-row" style="background: rgba(255, 215, 0, 0.1); border-radius: 5px; padding: 5px;">
+                                <span class="info-label" style="color: var(--gold);">⚠️ Formasyon</span>
+                                <span class="info-value" style="color: var(--gold); font-weight: bold;">
+                                    ${signal.technical.patterns.description}
+                                </span>
+                            </div>
+                            `
+                               : ''
+                           }
+
+                           ${
+                             signal.technical?.whale_alert?.detected
+                               ? `
+                            <div class="info-row" style="background: rgba(0, 255, 255, 0.1); border-radius: 5px; padding: 5px; border: 1px solid rgba(0,255,255,0.3); animation: pulse 2s infinite;">
+                                <span class="info-label" style="color: cyan;">🐋 BALİNA ALARMI</span>
+                                <span class="info-value" style="color: cyan; font-weight: bold;">
+                                    ${signal.technical.whale_alert.type}
+                                </span>
+                            </div>
+                            `
+                               : ''
+                           }
                         </div>
                     </div>
                     

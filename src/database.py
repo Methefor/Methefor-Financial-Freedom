@@ -60,6 +60,30 @@ class Signal(Base):
     
     timestamp = Column(DateTime, default=datetime.utcnow)
 
+class PortfolioItem(Base):
+    __tablename__ = 'portfolio'
+    
+    id = Column(Integer, primary_key=True)
+    symbol = Column(String, unique=True, index=True)
+    quantity = Column(Float, default=0.0)
+    average_price = Column(Float, default=0.0)
+    current_price = Column(Float, default=0.0) # Son güncellenen fiyat
+    last_updated = Column(DateTime, default=datetime.utcnow)
+
+class TradeExecution(Base):
+    __tablename__ = 'trades'
+    
+    id = Column(Integer, primary_key=True)
+    symbol = Column(String)
+    action = Column(String) # BUY / SELL
+    quantity = Column(Float)
+    price = Column(Float)
+    total_amount = Column(Float) # quantity * price
+    timestamp = Column(DateTime, default=datetime.utcnow)
+    
+    # Sell işlemiyse kâr/zarar durumu
+    pnl = Column(Float, nullable=True) 
+
 def init_db(db_path: str = "methefor.db"):
     """Veritabanını başlat"""
     engine = create_engine(f'sqlite:///{db_path}')

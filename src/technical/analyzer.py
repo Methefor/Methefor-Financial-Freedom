@@ -8,7 +8,9 @@ import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Tuple
+import ta
 import logging
+from src.technical.patterns import PatternRecognizer
 
 logger = logging.getLogger(__name__)
 
@@ -17,6 +19,7 @@ class TechnicalAnalyzer:
     """Teknik analiz göstergeleri hesaplama"""
     
     def __init__(self):
+        self.pattern_recognizer = PatternRecognizer()
         """Initialize technical analyzer"""
         logger.info("[OK] Technical Analyzer başlatıldı")
     
@@ -296,7 +299,9 @@ class TechnicalAnalyzer:
                 'volume': volume_metrics,
                 'bollinger_bands': bb_metrics,
                 'technical_signals': signals,
-                'overall_score': signals['score']
+                'overall_score': signals['score'],
+                'whale_alert': whale_alert, # Yeni eklenen alan
+                'patterns': patterns # Placeholder for patterns, as it was in the original return
             }
             
         except Exception as e:

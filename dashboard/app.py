@@ -19,7 +19,7 @@ BASE_DIR = Path(__file__).parent.parent
 sys.path.insert(0, str(BASE_DIR))
 
 # Database Imports
-from src.database import init_db, get_session, NewsItem, TechnicalResult, Signal
+from src.database import init_db, get_session, NewsItem, TechnicalResult, Signal, PortfolioItem
 
 app = Flask(__name__, 
             template_folder='templates',
@@ -30,10 +30,16 @@ socketio = SocketIO(app, cors_allowed_origins="*")
 # Database Engine
 db_engine = init_db(str(BASE_DIR / 'methefor.db'))
 
-# Global state (Cache)
+portfolio_summary = {}
+chatbot = AIChatbot()
+
+# Watchlist dosya yolu
+WARNING: This replacement might fail if lines changed. I'll target the global area.
 current_signals = []
 latest_news = []
 technical_data = {}
+portfolio_summary = {}
+chatbot = AIChatbot()
 
 # Watchlist dosya yolu
 WATCHLIST_FILE = BASE_DIR / 'config' / 'watchlist.json'
@@ -41,7 +47,7 @@ WATCHLIST_FILE = BASE_DIR / 'config' / 'watchlist.json'
 
 def load_latest_data():
     """En son veriyi veritabanından yükle"""
-    global current_signals, latest_news, technical_data
+    global current_signals, latest_news, technical_data, portfolio_summary
     
     session = get_session(db_engine)
     try:
@@ -75,6 +81,7 @@ def load_latest_data():
                     },
                     'price': {'current': 0}, # Fiyat bilgisi technical'da
                     'reasons': reasons,
+                    'ai_explanation': s.ai_explanation,
                     'timestamp': s.timestamp.isoformat()
                 }
                 temp_signals[s.symbol] = formatted_sig
@@ -120,7 +127,33 @@ def load_latest_data():
                     if 'technical_signals' in details:
                         matching_signal['technical']['decision'] = details['technical_signals'].get('decision', 'N/A')
 
-        print(f"✓ DB Data yüklendi: {len(current_signals)} sinyal, {len(latest_news)} haber")
+        # 4. Portfolio
+        db_portfolio = session.query(PortfolioItem).all()
+        portfolio_summary = {
+            'total_equity': 0,
+            'cash': 0,
+            'holdings': []
+        }
+        
+        equity = 0
+        for p in db_portfolio:
+            if p.symbol == 'USD':
+                portfolio_summary['cash'] = p.quantity
+                equity += p.quantity
+            else:
+                value = p.quantity * p.current_price
+                equity += value
+                portfolio_summary['holdings'].append({
+                    'symbol': p.symbol,
+                    'quantity': p.quantity,
+                    'price': p.current_price,
+                    'value': value,
+                    'avg_price': p.average_price,
+                    'pnl': (p.current_price - p.average_price) / p.average_price * 100 if p.average_price else 0
+                })
+        portfolio_summary['total_equity'] = equity
+
+        print(f"✓ DB Data yüklendi: {len(current_signals)} sinyal, {len(latest_news)} haber, Portfolio: ${equity:.2f}")
         
     except Exception as e:
         print(f"DB Data yükleme hatası: {e}")
@@ -238,6 +271,34 @@ def get_summary():
     })
 
 
+@app.route('/api/portfolio')
+def get_portfolio():
+    """Portföy durumunu döndür"""
+    return jsonify({
+        'success': True,
+        'portfolio': portfolio_summary,
+        'timestamp': datetime.now().isoformat()
+    })
+
+
+@app.route('/api/chat', methods=['POST'])
+def chat():
+    """AI Chatbot ile konuş"""
+    data = request.json
+    user_message = data.get('message', '')
+    
+    if not user_message:
+        return jsonify({'error': 'Mesaj boş olamaz'}), 400
+        
+    response = chatbot.send_message(user_message)
+    
+    return jsonify({
+        'success': True,
+        'response': response,
+        'timestamp': datetime.now().isoformat()
+    })
+
+
 # WebSocket events
 @socketio.on('connect')
 def handle_connect():
@@ -247,7 +308,8 @@ def handle_connect():
     
     emit('initial_data', {
         'signals': current_signals[:10],
-        'news': latest_news[:20]
+        'news': latest_news[:20],
+        'portfolio': portfolio_summary
     })
 
 
@@ -464,6 +526,7 @@ def background_update_task():
         socketio.emit('data_update', {
             'signals': current_signals[:10],
             'news': latest_news[:20],
+            'portfolio': portfolio_summary,
             'timestamp': datetime.now().isoformat()
         }, namespace='/')
 

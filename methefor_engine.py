@@ -29,7 +29,8 @@ from src.technical.analyzer import TechnicalAnalyzer
 from src.notifications.telegram_bot import TelegramBot
 from src.discovery.discovery_engine import DiscoveryEngine
 from src.ai.analyst import AIAnalyst
-from src.database import init_db, get_session, NewsItem, TechnicalResult, Signal, Base
+from src.trading.paper import PaperTrader
+from src.database import init_db, get_session, NewsItem, TechnicalResult, Signal, Base, PortfolioItem
 
 # Logging setup
 log_dir = project_root / 'logs'
@@ -92,8 +93,9 @@ class MetheforFinancialFreedom:
         self.telegram_bot = TelegramBot(config_path=str(config_dir / 'api_keys.json'))
         self.discovery_engine = DiscoveryEngine(config=self.watchlist.get('discovery', {}))
         self.ai_analyst = AIAnalyst()
+        self.paper_trader = PaperTrader(lambda: get_session(self.db_engine))
         
-        logger.info("[OK] Tüm modüller yüklendi!\n")
+        logger.info("[OK] Tüm modüller yüklendi! (Paper Trading Aktif)\n")
     
     def _load_config(self, path: Path) -> dict:
         """Config dosyasını yükle"""
@@ -381,10 +383,14 @@ class MetheforFinancialFreedom:
             # self.telegram_bot.send_alerts... (Implement wrapper if needed)
             pass 
         
-        # 6. DB Save
+        # 6. Sonuçları Kaydet
         self.save_to_db(analyzed_news, technical_results, signals)
         
-        # 7. Summary
+        # 7. Paper Trading (Sanal İşlem)
+        logger.info("🤖 Paper Trading işlemleri kontrol ediliyor...")
+        self.paper_trader.execute_strategy(signals)
+        
+        # 8. Raporla
         self.print_summary(signals)
         
         elapsed = time.time() - start_time
