@@ -16,7 +16,7 @@ class AIChatbot:
         if self.api_key:
             try:
                 genai.configure(api_key=self.api_key)
-                self.model = genai.GenerativeModel('gemini-pro')
+                self.model = genai.GenerativeModel('gemini-1.5-flash')
                 self.start_new_session()
                 logger.info("AIChatbot initialized successfully")
             except Exception as e:
