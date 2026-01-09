@@ -20,6 +20,7 @@ sys.path.insert(0, str(BASE_DIR))
 
 # Database Imports
 from src.database import init_db, get_session, NewsItem, TechnicalResult, Signal, PortfolioItem
+from src.ai.chatbot import AIChatbot
 
 app = Flask(__name__, 
             template_folder='templates',
@@ -30,11 +31,7 @@ socketio = SocketIO(app, cors_allowed_origins="*")
 # Database Engine
 db_engine = init_db(str(BASE_DIR / 'methefor.db'))
 
-portfolio_summary = {}
-chatbot = AIChatbot()
-
-# Watchlist dosya yolu
-WARNING: This replacement might fail if lines changed. I'll target the global area.
+# Global state (Cache)
 current_signals = []
 latest_news = []
 technical_data = {}
