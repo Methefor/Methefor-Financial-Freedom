@@ -31,36 +31,45 @@ socketio = SocketIO(app, cors_allowed_origins="*")
 # Database Engine
 db_engine = init_db(str(BASE_DIR / 'methefor.db'))
 
-# Global state (Cache)
-current_signals = []
-latest_news = []
-technical_data = {}
-portfolio_summary = {}
-chatbot = AIChatbot()
-
 # Watchlist dosya yolu
 WATCHLIST_FILE = BASE_DIR / 'config' / 'watchlist.json'
+SETTINGS_FILE = BASE_DIR / 'config' / 'settings.json'
+
+class AppData:
+    """Uygulama verilerini ve ayarlarını yöneten sınıf"""
+    def __init__(self):
+        self.current_signals = []
+        self.latest_news = []
+        self.technical_data = {}
+        self.portfolio_summary = {}
+        self.chatbot = AIChatbot()
+        self.settings = self.load_settings()
+
+    def load_settings(self):
+        if SETTINGS_FILE.exists():
+            with open(SETTINGS_FILE, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        return {"ui": {"theme": "dark"}, "analysis": {"rsi_overbought": 70}}
+
+    def save_settings(self, new_settings):
+        self.settings.update(new_settings)
+        with open(SETTINGS_FILE, 'w', encoding='utf-8') as f:
+            json.dump(self.settings, f, indent=2, ensure_ascii=False)
+
+data = AppData()
 
 
 def load_latest_data():
     """En son veriyi veritabanından yükle"""
-    global current_signals, latest_news, technical_data, portfolio_summary
-    
     session = get_session(db_engine)
     try:
         # 1. Signals
-        # Get latest signals unique by symbol (or just latest batch)
-        # For simplicity, getting all signals from today or latest 50
         db_signals = session.query(Signal).order_by(Signal.timestamp.desc()).limit(100).all()
         
-        # Transform for frontend
-        temp_signals = {} # Use dict to get unique latest per symbol
-        
+        temp_signals = {}
         for s in db_signals:
             if s.symbol not in temp_signals:
                 reasons = json.loads(s.reasons) if s.reasons else []
-                
-                # Reconstruct expected format
                 formatted_sig = {
                     'symbol': s.symbol,
                     'decision': s.decision,
@@ -69,28 +78,28 @@ def load_latest_data():
                     'sentiment': {
                         'score': s.news_sentiment_score,
                         'label': 'positive' if s.news_sentiment_score > 0.1 else 'negative' if s.news_sentiment_score < -0.1 else 'neutral',
-                        'news_count': 0 # DB'de saklamadık, ekleyebiliriz veya 0 geçebiliriz
+                        'news_count': 0
                     },
                     'technical': {
                         'score': s.technical_score,
-                        'decision': 'N/A', # Detay lazım olursa technical_results'dan çekilebilir
+                        'decision': 'N/A',
                         'trend': 'N/A'
                     },
-                    'price': {'current': 0}, # Fiyat bilgisi technical'da
+                    'price': {'current': 0},
                     'reasons': reasons,
                     'ai_explanation': s.ai_explanation,
                     'timestamp': s.timestamp.isoformat()
                 }
                 temp_signals[s.symbol] = formatted_sig
         
-        current_signals = list(temp_signals.values())
-        current_signals.sort(key=lambda x: x['combined_score'], reverse=True)
+        data.current_signals = list(temp_signals.values())
+        data.current_signals.sort(key=lambda x: x['combined_score'], reverse=True)
 
         # 2. News
         db_news = session.query(NewsItem).order_by(NewsItem.published_date.desc()).limit(50).all()
-        latest_news = []
+        data.latest_news = []
         for n in db_news:
-            latest_news.append({
+            data.latest_news.append({
                 'id': n.id,
                 'source': n.source,
                 'title': n.title,
@@ -106,17 +115,15 @@ def load_latest_data():
             })
 
         # 3. Technical
-        # Get latest technical per symbol
         db_tech = session.query(TechnicalResult).order_by(TechnicalResult.timestamp.desc()).limit(100).all()
         
-        technical_data = {}
+        data.technical_data = {}
         for t in db_tech:
-            if t.symbol not in technical_data:
+            if t.symbol not in data.technical_data:
                 details = json.loads(t.details) if t.details else {}
-                technical_data[t.symbol] = details
+                data.technical_data[t.symbol] = details
                 
-                # Update signal with better technical info if available
-                matching_signal = next((s for s in current_signals if s['symbol'] == t.symbol), None)
+                matching_signal = next((s for s in data.current_signals if s['symbol'] == t.symbol), None)
                 if matching_signal:
                     matching_signal['technical']['rsi'] = t.rsi
                     matching_signal['technical']['trend'] = t.trend
@@ -126,21 +133,17 @@ def load_latest_data():
 
         # 4. Portfolio
         db_portfolio = session.query(PortfolioItem).all()
-        portfolio_summary = {
-            'total_equity': 0,
-            'cash': 0,
-            'holdings': []
-        }
+        data.portfolio_summary = {'total_equity': 0, 'cash': 0, 'holdings': []}
         
         equity = 0
         for p in db_portfolio:
             if p.symbol == 'USD':
-                portfolio_summary['cash'] = p.quantity
+                data.portfolio_summary['cash'] = p.quantity
                 equity += p.quantity
             else:
                 value = p.quantity * p.current_price
                 equity += value
-                portfolio_summary['holdings'].append({
+                data.portfolio_summary['holdings'].append({
                     'symbol': p.symbol,
                     'quantity': p.quantity,
                     'price': p.current_price,
@@ -148,12 +151,8 @@ def load_latest_data():
                     'avg_price': p.average_price,
                     'pnl': (p.current_price - p.average_price) / p.average_price * 100 if p.average_price else 0
                 })
-        portfolio_summary['total_equity'] = equity
-
-        print(f"✓ DB Data yüklendi: {len(current_signals)} sinyal, {len(latest_news)} haber, Portfolio: ${equity:.2f}")
-        
-    except Exception as e:
-        print(f"DB Data yükleme hatası: {e}")
+        data.portfolio_summary['total_equity'] = equity
+        print(f"✓ DB Data yüklendi: {len(data.current_signals)} sinyal, Portfolio: ${equity:.2f}")
     finally:
         session.close()
 
@@ -170,8 +169,8 @@ def get_signals():
     """Tüm sinyalleri döndür"""
     return jsonify({
         'success': True,
-        'count': len(current_signals),
-        'signals': current_signals,
+        'count': len(data.current_signals),
+        'signals': data.current_signals,
         'timestamp': datetime.now().isoformat()
     })
 
@@ -180,7 +179,7 @@ def get_signals():
 def get_symbol_signal(symbol):
     """Belirli bir sembolün sinyalini döndür"""
     symbol_upper = symbol.upper()
-    signal = next((s for s in current_signals if s['symbol'] == symbol_upper), None)
+    signal = next((s for s in data.current_signals if s['symbol'] == symbol_upper), None)
     
     if signal:
         return jsonify({'success': True, 'signal': signal})
@@ -194,8 +193,8 @@ def get_news():
     limit = request.args.get('limit', 20, type=int)
     return jsonify({
         'success': True,
-        'count': len(latest_news),
-        'news': latest_news[:limit],
+        'count': len(data.latest_news),
+        'news': data.latest_news[:limit],
         'timestamp': datetime.now().isoformat()
     })
 
@@ -206,7 +205,7 @@ def get_symbol_news(symbol):
     symbol_upper = symbol.upper()
     
     symbol_news = [
-        n for n in latest_news 
+        n for n in data.latest_news 
         if n.get('matched_symbol') == symbol_upper
     ]
     
@@ -222,7 +221,7 @@ def get_symbol_news(symbol):
 def get_technical(symbol):
     """Belirli bir sembolün teknik analizini döndür"""
     symbol_upper = symbol.upper()
-    tech = technical_data.get(symbol_upper)
+    tech = data.technical_data.get(symbol_upper)
     
     if tech:
         return jsonify({'success': True, 'technical': tech})
@@ -234,21 +233,21 @@ def get_technical(symbol):
 def get_summary():
     """Dashboard özet istatistikleri"""
     
-    strong_buy = sum(1 for s in current_signals if s['decision'] == 'STRONG BUY')
-    buy = sum(1 for s in current_signals if s['decision'] == 'BUY')
-    hold = sum(1 for s in current_signals if s['decision'] == 'HOLD')
-    sell = sum(1 for s in current_signals if s['decision'] == 'SELL')
-    strong_sell = sum(1 for s in current_signals if s['decision'] == 'STRONG SELL')
+    strong_buy = sum(1 for s in data.current_signals if s['decision'] == 'STRONG BUY')
+    buy = sum(1 for s in data.current_signals if s['decision'] == 'BUY')
+    hold = sum(1 for s in data.current_signals if s['decision'] == 'HOLD')
+    sell = sum(1 for s in data.current_signals if s['decision'] == 'SELL')
+    strong_sell = sum(1 for s in data.current_signals if s['decision'] == 'STRONG SELL')
     
-    top_signals = sorted(current_signals, key=lambda x: x['combined_score'], reverse=True)[:5]
+    top_signals = sorted(data.current_signals, key=lambda x: x['combined_score'], reverse=True)[:5]
     
-    positive_news = sum(1 for n in latest_news if n.get('sentiment', {}).get('label') == 'positive')
-    negative_news = sum(1 for n in latest_news if n.get('sentiment', {}).get('label') == 'negative')
+    positive_news = sum(1 for n in data.latest_news if n.get('sentiment', {}).get('label') == 'positive')
+    negative_news = sum(1 for n in data.latest_news if n.get('sentiment', {}).get('label') == 'negative')
     
     return jsonify({
         'success': True,
         'summary': {
-            'total_signals': len(current_signals),
+            'total_signals': len(data.current_signals),
             'signal_distribution': {
                 'strong_buy': strong_buy,
                 'buy': buy,
@@ -257,10 +256,10 @@ def get_summary():
                 'strong_sell': strong_sell
             },
             'news_stats': {
-                'total': len(latest_news),
+                'total': len(data.latest_news),
                 'positive': positive_news,
                 'negative': negative_news,
-                'neutral': len(latest_news) - positive_news - negative_news
+                'neutral': len(data.latest_news) - positive_news - negative_news
             },
             'top_signals': top_signals
         },
@@ -273,21 +272,31 @@ def get_portfolio():
     """Portföy durumunu döndür"""
     return jsonify({
         'success': True,
-        'portfolio': portfolio_summary,
+        'portfolio': data.portfolio_summary,
         'timestamp': datetime.now().isoformat()
     })
+
+@app.route('/api/settings', methods=['GET', 'POST'])
+def handle_settings():
+    """Ayarları getir veya güncelle"""
+    if request.method == 'GET':
+        return jsonify({'success': True, 'settings': data.settings})
+    else:
+        new_settings = request.json
+        data.save_settings(new_settings)
+        return jsonify({'success': True, 'message': 'Ayarlar kaydedildi'})
 
 
 @app.route('/api/chat', methods=['POST'])
 def chat():
     """AI Chatbot ile konuş"""
-    data = request.json
-    user_message = data.get('message', '')
+    data_req = request.json
+    user_message = data_req.get('message', '')
     
     if not user_message:
         return jsonify({'error': 'Mesaj boş olamaz'}), 400
         
-    response = chatbot.send_message(user_message)
+    response = data.chatbot.send_message(user_message)
     
     return jsonify({
         'success': True,
@@ -304,9 +313,10 @@ def handle_connect():
     emit('status', {'message': 'Connected to Methefor Financial Freedom'})
     
     emit('initial_data', {
-        'signals': current_signals[:10],
-        'news': latest_news[:20],
-        'portfolio': portfolio_summary
+        'signals': data.current_signals[:10],
+        'news': data.latest_news[:20],
+        'portfolio': data.portfolio_summary,
+        'settings': data.settings
     })
 
 
@@ -322,8 +332,8 @@ def handle_update_request():
     load_latest_data()
     
     emit('data_update', {
-        'signals': current_signals[:10],
-        'news': latest_news[:20],
+        'signals': data.current_signals[:10],
+        'news': data.latest_news[:20],
         'timestamp': datetime.now().isoformat()
     })
 
@@ -521,9 +531,9 @@ def background_update_task():
         load_latest_data()
         
         socketio.emit('data_update', {
-            'signals': current_signals[:10],
-            'news': latest_news[:20],
-            'portfolio': portfolio_summary,
+            'signals': data.current_signals[:10],
+            'news': data.latest_news[:20],
+            'portfolio': data.portfolio_summary,
             'timestamp': datetime.now().isoformat()
         }, namespace='/')
 

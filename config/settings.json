@@ -1,0 +1,20 @@
+{
+  "ui": {
+    "theme": "cyber",
+    "primary_color": "gold",
+    "compact_mode": false
+  },
+  "analysis": {
+    "rsi_overbought": 70,
+    "rsi_oversold": 30,
+    "min_confidence": 70,
+    "signal_weights": {
+      "technical": 60,
+      "sentiment": 40
+    }
+  },
+  "notifications": {
+    "telegram_enabled": true,
+    "browser_push_enabled": false
+  }
+}

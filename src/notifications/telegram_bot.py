@@ -26,17 +26,21 @@ class TelegramBot:
             self.bot_token = bot_token
             self.chat_id = chat_id
         else:
-            # Config'den oku
-            try:
-                with open(config_path, 'r', encoding='utf-8') as f:
-                    config = json.load(f)
-                    telegram_config = config.get('telegram', {})
-                    self.bot_token = telegram_config.get('bot_token', '')
-                    self.chat_id = telegram_config.get('chat_id', '')
-            except Exception as e:
-                logger.error(f"Telegram config yüklenemedi: {e}")
-                self.bot_token = ''
-                self.chat_id = ''
+            # Önce .env kontrol et
+            import os
+            self.bot_token = os.getenv('TELEGRAM_BOT_TOKEN', '')
+            self.chat_id = os.getenv('TELEGRAM_CHAT_ID', '')
+            
+            # Eğer .env'de yoksa config'den oku
+            if not self.bot_token or not self.chat_id:
+                try:
+                    with open(config_path, 'r', encoding='utf-8') as f:
+                        config = json.load(f)
+                        telegram_config = config.get('telegram', {})
+                        self.bot_token = self.bot_token or telegram_config.get('bot_token', '')
+                        self.chat_id = self.chat_id or telegram_config.get('chat_id', '')
+                except Exception as e:
+                    logger.error(f"Telegram config yüklenemedi: {e}")
         
         self.base_url = f"https://api.telegram.org/bot{self.bot_token}"
         

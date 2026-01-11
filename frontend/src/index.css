@@ -1,0 +1,19 @@
+@import "tailwindcss";
+
+@theme {
+  --color-gold: #ffd700;
+  --color-gold-dark: #b8860b;
+  --color-dark-bg: #0a0e27;
+}
+
+:root {
+  --gold: #ffd700;
+  --dark-bg: #0a0e27;
+}
+
+body {
+  margin: 0;
+  background-color: var(--dark-bg);
+  color: white;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}

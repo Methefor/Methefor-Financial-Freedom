@@ -12,6 +12,8 @@ import json
 import asyncio
 import aiohttp
 from pathlib import Path
+from dotenv import load_dotenv
+load_dotenv()
 from datetime import datetime
 import time
 import logging

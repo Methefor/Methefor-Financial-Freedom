@@ -20,7 +20,7 @@ class AIAnalyst:
         if self.api_key:
             try:
                 genai.configure(api_key=self.api_key)
-                self.model = genai.GenerativeModel('gemini-1.5-flash')
+                self.model = genai.GenerativeModel('gemini-2.5-flash')
                 self.enabled = True
                 logger.info("[OK] AI Analyst (Gemini) aktifleştirildi.")
             except Exception as e:
@@ -30,39 +30,42 @@ class AIAnalyst:
 
     def explain_signal(self, symbol: str, signal_data: Dict, news_context: list = []) -> str:
         """
-        Sinyal için kısa, profesyonel bir açıklama üretir.
+        Sinyal için Çoklu Ajan Sistemi üzerinden kapsamlı bir açıklama üretir.
         """
         if not self.enabled:
             return self._fallback_explanation(symbol, signal_data)
             
         try:
-            # Context oluştur
-            tech_signals = ", ".join(signal_data.get('reasons', []))
-            score = signal_data.get('combined_score', 0)
-            decision = signal_data.get('decision', 'HOLD')
-            
-            # Haber özetlerini birleştir (max 3 haber)
-            news_text = ""
-            if news_context:
-                news_text = "Son Haberler:\n" + "\n".join([f"- {n.get('title')}" for n in news_context[:3]])
-            
-            prompt = f"""
-            Sen kıdemli bir finansal analistsin. Aşağıdaki verileri kullanarak {symbol} için neden {decision} kararı verildiğini 2 cümle ile açıkla.
-            
-            Teknik Veriler:
-            - Karar: {decision} (Skor: {score}/100)
-            - Göstergeler: {tech_signals}
-            
-            {news_text}
-            
-            Yorumun profesyonel, yatırım tavsiyesi vermeden (YTD) sadece teknik ve temel analizi özetleyen Türkçe bir açıklama olsun.
-            """
-            
-            response = self.model.generate_content(prompt)
-            return response.text.strip()
+            from src.ai.multi_agent import multi_agent_system
+            import asyncio
+
+            # Async metodu senkronize olarak çalıştır (dashboard uyumluluğu için)
+            loop = asyncio.get_event_loop()
+            if loop.is_running():
+                # Eğer event loop zaten çalışıyorsa (dashboard gibi), yeni bir görev oluşturamayız
+                # Bu yüzden basitleştirilmiş bir sentez yapıyoruz
+                return self._sync_explain(symbol, signal_data, news_context)
+            else:
+                analysis = loop.run_until_complete(
+                    multi_agent_system.get_comprehensive_analysis(symbol, signal_data, news_context)
+                )
+                return analysis
             
         except Exception as e:
             logger.error(f"AI Generation Error for {symbol}: {e}")
+            return self._sync_explain(symbol, signal_data, news_context)
+
+    def _sync_explain(self, symbol: str, signal_data: Dict, news_context: list = []) -> str:
+        """Senkronize basitleştirilmiş analiz"""
+        try:
+            tech_signals = ", ".join(signal_data.get('reasons', []))
+            decision = signal_data.get('decision', 'HOLD')
+            news_text = "\n".join([f"- {n.get('title')}" for n in news_context[:2]]) if news_context else ""
+            
+            prompt = f"Baş Analist olarak {symbol} için {decision} kararını özetle. Teknik: {tech_signals}. Haberler: {news_text}. 2 cümle."
+            response = self.model.generate_content(prompt)
+            return response.text.strip()
+        except:
             return self._fallback_explanation(symbol, signal_data)
 
     def _fallback_explanation(self, symbol: str, signal_data: Dict) -> str:
