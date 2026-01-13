@@ -19,8 +19,9 @@ BASE_DIR = Path(__file__).parent.parent
 sys.path.insert(0, str(BASE_DIR))
 
 # Database Imports
-from src.database import init_db, get_session, NewsItem, TechnicalResult, Signal, PortfolioItem
+from src.database import init_db, get_session, NewsItem, TechnicalResult, Signal, PortfolioItem, PortfolioSnapshot
 from src.ai.chatbot import AIChatbot
+from src.trading.paper import PaperTrader
 
 app = Flask(__name__, 
             template_folder='templates',
@@ -43,6 +44,7 @@ class AppData:
         self.technical_data = {}
         self.portfolio_summary = {}
         self.chatbot = AIChatbot()
+        self.paper_trader = PaperTrader(lambda: get_session(db_engine))
         self.settings = self.load_settings()
 
     def load_settings(self):
@@ -275,6 +277,73 @@ def get_portfolio():
         'portfolio': data.portfolio_summary,
         'timestamp': datetime.now().isoformat()
     })
+
+@app.route('/api/trade', methods=['POST'])
+def execute_trade():
+    """Manuel işlem yap (Kağıt üzerinde Al/Sat)"""
+    req_data = request.json
+    symbol = req_data.get('symbol', '').upper()
+    side = req_data.get('side', '').upper() # BUY or SELL
+    quantity = float(req_data.get('quantity', 0))
+    price = float(req_data.get('price', 0))
+
+    if not symbol or not side or quantity <= 0 or price <= 0:
+        return jsonify({'success': False, 'error': 'Eksik veya geçersiz veri.'}), 400
+
+    success, message = data.paper_trader.execute_manual_trade(symbol, side, quantity, price)
+    
+    if success:
+        # Portföyü hemen güncelle ve client'lara yayınla
+        load_latest_data()
+        socketio.emit('data_update', {
+            'portfolio': data.portfolio_summary,
+            'timestamp': datetime.now().isoformat()
+        }, namespace='/')
+        
+        return jsonify({'success': True, 'message': message, 'portfolio': data.portfolio_summary})
+    else:
+        return jsonify({'success': False, 'error': message}), 400
+
+@app.route('/api/portfolio/history')
+def get_portfolio_history():
+    """Portföy değer geçmişini döndür"""
+    session = get_session(db_engine)
+    try:
+        # Son 30 snapshot'ı getir
+        history = session.query(PortfolioSnapshot).order_by(PortfolioSnapshot.timestamp.asc()).limit(100).all()
+        result = []
+        for h in history:
+            result.append({
+                'equity': h.total_equity,
+                'cash': h.cash,
+                'holdings': h.holdings_value,
+                'time': h.timestamp.isoformat()
+            })
+        return jsonify({'success': True, 'history': result})
+    finally:
+        session.close()
+
+def record_portfolio_snapshot():
+    """Mevcut portföy durumunu geçmişe kaydet"""
+    session = get_session(db_engine)
+    try:
+        summary = data.portfolio_summary
+        if not summary or 'total_equity' not in summary:
+            return
+            
+        snapshot = PortfolioSnapshot(
+            total_equity=summary['total_equity'],
+            cash=summary['cash'],
+            holdings_value=summary['total_equity'] - summary['cash']
+        )
+        session.add(snapshot)
+        session.commit()
+        print(f"📈 Portfolio snapshot kaydedildi: ${summary['total_equity']:.2f}")
+    except Exception as e:
+        print(f"Error recording snapshot: {e}")
+        session.rollback()
+    finally:
+        session.close()
 
 @app.route('/api/settings', methods=['GET', 'POST'])
 def handle_settings():
@@ -550,6 +619,15 @@ def main():
     
     update_thread = threading.Thread(target=background_update_task, daemon=True)
     update_thread.start()
+    
+    # Her 30 dakikada bir snapshot al (Daha sık takip için 30 dk idealdur)
+    def snapshot_loop():
+        while True:
+            record_portfolio_snapshot()
+            time.sleep(1800) # 30 dakika
+            
+    snapshot_thread = threading.Thread(target=snapshot_loop, daemon=True)
+    snapshot_thread.start()
     
     print("\n✓ Dashboard hazır!")
     print("\n📱 Tarayıcıda aç:")

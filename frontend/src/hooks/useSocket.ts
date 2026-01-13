@@ -1,15 +1,24 @@
 import { useEffect, useRef, useState } from 'react';
-import { io } from 'socket.io-client';
+import { io, Socket } from 'socket.io-client';
+import { AppSettings, NewsItem, Portfolio, Signal } from '../types';
+
+interface SocketData {
+  signals: Signal[];
+  news: NewsItem[];
+  portfolio: Partial<Portfolio>;
+  settings: Partial<AppSettings>;
+  status: 'connecting' | 'connected' | 'disconnected';
+}
 
 export const useSocket = () => {
-  const [data, setData] = useState({
+  const [data, setData] = useState<SocketData>({
     signals: [],
     news: [],
     portfolio: {},
     settings: {},
     status: 'connecting'
   });
-  const socketRef = useRef(null);
+  const socketRef = useRef<Socket | null>(null);
 
   useEffect(() => {
     const socket = io('/', {
@@ -24,7 +33,7 @@ export const useSocket = () => {
       setData(prev => ({ ...prev, status: 'connected' }));
     });
 
-    socket.on('initial_data', (initialData) => {
+    socket.on('initial_data', (initialData: any) => {
       console.log('✓ Initial data received:', initialData);
       setData(prev => ({ 
         ...prev, 
@@ -35,7 +44,7 @@ export const useSocket = () => {
       }));
     });
 
-    socket.on('data_update', (update) => {
+    socket.on('data_update', (update: any) => {
       console.log('⟳ Data update received:', update);
       setData(prev => ({ 
         ...prev, 

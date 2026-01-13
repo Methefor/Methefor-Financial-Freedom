@@ -84,6 +84,16 @@ class TradeExecution(Base):
     # Sell işlemiyse kâr/zarar durumu
     pnl = Column(Float, nullable=True) 
 
+class PortfolioSnapshot(Base):
+    """Portföy değerinin tarihsel değişimi"""
+    __tablename__ = 'portfolio_snapshots'
+    
+    id = Column(Integer, primary_key=True)
+    total_equity = Column(Float)
+    cash = Column(Float)
+    holdings_value = Column(Float)
+    timestamp = Column(DateTime, default=datetime.utcnow)
+
 def init_db(db_path: str = "methefor.db"):
     """Veritabanını başlat"""
     engine = create_engine(f'sqlite:///{db_path}')

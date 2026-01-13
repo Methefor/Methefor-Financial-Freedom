@@ -1,7 +1,11 @@
 import { useEffect, useRef } from 'react';
 
-export const TradingViewChart = ({ symbol }) => {
-  const container = useRef();
+interface TradingViewChartProps {
+  symbol: string;
+}
+
+export const TradingViewChart = ({ symbol }: TradingViewChartProps) => {
+  const container = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     // Clear previous widget
@@ -38,12 +42,15 @@ export const TradingViewChart = ({ symbol }) => {
       "calendar": false,
       "support_host": "https://www.tradingview.com"
     });
-    container.current.appendChild(script);
+    
+    if (container.current) {
+      container.current.appendChild(script);
+    }
   }, [symbol]);
 
   return (
-    <div className="tradingview-widget-container h-[400px] w-full rounded-2xl overflow-hidden border border-white/10" ref={container}>
-      <div className="tradingview-widget-container__widget h-[400px] w-full"></div>
+    <div className="tradingview-widget-container h-[500px] w-full bg-black/20" ref={container}>
+      <div className="tradingview-widget-container__widget h-full w-full"></div>
     </div>
   );
 };

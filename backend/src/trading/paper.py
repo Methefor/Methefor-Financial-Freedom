@@ -74,6 +74,76 @@ class PaperTrader:
         finally:
             session.close()
 
+    def execute_manual_trade(self, symbol, side, quantity, price):
+        """Kullanıcının tetiklediği manuel işlemi gerçekleştir"""
+        session = self.session_factory()
+        try:
+            cash_acc = session.query(PortfolioItem).filter_by(symbol='USD').first()
+            if not cash_acc:
+                self._ensure_cash_account()
+                cash_acc = session.query(PortfolioItem).filter_by(symbol='USD').first()
+
+            position = session.query(PortfolioItem).filter_by(symbol=symbol).first()
+            amount = quantity * price
+
+            if side.upper() == 'BUY':
+                if cash_acc.quantity < amount:
+                    return False, f"Yetersiz bakiye! Gerekli: ${amount:.2f}, Mevcut: ${cash_acc.quantity:.2f}"
+                
+                # Update Portfolio
+                if position:
+                    total_cost = (position.quantity * position.average_price) + amount
+                    position.quantity += quantity
+                    position.average_price = total_cost / position.quantity
+                    position.current_price = price
+                else:
+                    new_pos = PortfolioItem(
+                        symbol=symbol, 
+                        quantity=quantity, 
+                        average_price=price,
+                        current_price=price
+                    )
+                    session.add(new_pos)
+                
+                cash_acc.quantity -= amount
+                action_label = 'ALIM'
+
+            elif side.upper() == 'SELL':
+                if not position or position.quantity < quantity:
+                    return False, f"Yetersiz varlık! Mevcut {symbol}: {position.quantity if position else 0}"
+                
+                # Update Portfolio
+                position.quantity -= quantity
+                if position.quantity <= 0.0001: # Kalan çok azsa sil
+                    session.delete(position)
+                
+                cash_acc.quantity += amount
+                action_label = 'SATIŞ'
+            else:
+                return False, "Geçersiz işlem tipi (BUY/SELL)"
+
+            # Log Trade
+            trade = TradeExecution(
+                symbol=symbol,
+                action=side.upper(),
+                quantity=quantity,
+                price=price,
+                total_amount=amount,
+                timestamp=datetime.now()
+            )
+            session.add(trade)
+            session.commit()
+            
+            logger.info(f"✨ MANUEL {action_label}: {symbol} - {quantity} adet @ ${price}")
+            return True, f"{symbol} {action_label} işlemi başarılı."
+
+        except Exception as e:
+            logger.error(f"Manuel trade hatası: {e}")
+            session.rollback()
+            return False, str(e)
+        finally:
+            session.close()
+
     def execute_strategy(self, signals):
         """Sinyallere göre işlem yap"""
         status = self.get_portfolio_status()
